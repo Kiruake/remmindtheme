@@ -30,7 +30,7 @@ get_header();
         $competences = get_the_terms(get_the_ID(), 'competence');
         $metiers = get_the_terms(get_the_ID(), 'metier');
         $promotions = get_the_terms(get_the_ID(), 'promotion');
-        $lieu_metier = get_field('lieu_metier');
+        $nom_entreprise = get_field('nom_entreprise');
     ?>
 
         <!-- Affichage des champs récupérés -->
@@ -69,10 +69,10 @@ get_header();
         <div class="metiers">
 
             <div>
-                <?php if ($metiers && !is_wp_error($metiers) || $lieu_metier) : ?>
+                <?php if ($metiers && !is_wp_error($metiers) || $nom_entreprise) : ?>
             
                 <?php foreach ($metiers as $metier) : ?>
-                    <h2><?php echo esc_html($metier->name) . ' - ' . esc_html($lieu_metier); ?></h2>
+                    <h2><?php echo esc_html($metier->name) . ' - ' . esc_html($nom_entreprise); ?></h2>
                 <?php endforeach; ?>
             
                 <?php endif; ?>

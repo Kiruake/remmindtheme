@@ -55,6 +55,10 @@ get_header();
         'post_type' => 'portrait', // Remplacez 'portrait' par le slug de votre type de contenu personnalisé
         'posts_per_page' => 4,
         'orderby' => 'rand', // Aléatoire
+        'meta_query' => [
+        ['key' => '_latitude', 'compare' => 'EXISTS'],
+        ['key' => '_longitude', 'compare' => 'EXISTS'],
+    ],
     );
 
     $random_portraits = new WP_Query($args);
@@ -169,5 +173,206 @@ get_header();
 
 </div>
 
+<?php
+// Récupérer toutes les publications "portrait" avec des coordonnées
+$args = [
+    'post_type' => 'portrait',
+    'posts_per_page' => -1,
+    'meta_query' => [
+        ['key' => '_latitude', 'compare' => 'EXISTS'],
+        ['key' => '_longitude', 'compare' => 'EXISTS'],
+    ],
+];
+$query = new WP_Query($args);
+
+$locations = [];
+if ($query->have_posts()) {
+    while ($query->have_posts()) {
+        $query->the_post();
+        $ville_entreprise = get_post_meta(get_the_ID(), 'ville_entreprise', true);
+        $nom_entreprise = get_post_meta(get_the_ID(), 'nom_entreprise', true);
+
+        // Ajouter les informations à la liste
+        if ($ville_entreprise && $nom_entreprise) {
+            $locations[] = [
+                'nom_entreprise' => $nom_entreprise,
+                'ville_entreprise' => $ville_entreprise,
+                'lat' => get_post_meta(get_the_ID(), '_latitude', true),
+                'lng' => get_post_meta(get_the_ID(), '_longitude', true),
+            ];
+        }
+    }
+}
+wp_reset_postdata();
+?>
+
+<div id="map" style="height: 500px; width: 75%; float: left;"></div>
+<div id="overlay" style="height: 500px; width: 25%; float: left; background-color: #f4f4f4; padding: 20px; display: none;">
+    <h3>Entreprises dans la ville </h3>
+    <div id="company-list"></div>
+</div>
+
+
+
+
 
 <?php get_footer(); ?>
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const map = L.map('map').setView([48.8566, 2.3522], 5); // Centré sur la France
+
+    // Ajouter la couche OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
+
+    // Liste des entreprises avec leurs coordonnées
+    const locations = <?php echo json_encode($locations); ?>;
+
+    // Créer un objet pour organiser les entreprises par ville
+    const cities = {};
+
+    locations.forEach(location => {
+        if (location.lat && location.lng) {
+            const city = location.ville_entreprise;
+            if (!cities[city]) {
+                cities[city] = [];
+            }
+            cities[city].push(location);
+        }
+    });
+
+    // Ajouter un marqueur pour chaque entreprise
+    locations.forEach(location => {
+        if (location.lat && location.lng) {
+            const marker = L.marker([location.lat, location.lng]).addTo(map);
+
+            // Lier un événement au marqueur pour afficher l'overlay
+            marker.on('click', function() {
+                const city = location.ville_entreprise; // Récupérer la ville du marqueur cliqué
+                const cityLocations = cities[city]; // Filtrer les entreprises de cette ville
+
+                // Mettre à jour l'overlay avec la liste des entreprises de cette ville
+                const companyListDiv = document.getElementById('company-list');
+                companyListDiv.innerHTML = ''; // Vider le contenu précédent
+
+                // Afficher les entreprises dans l'overlay
+                cityLocations.forEach(loc => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <h4>${loc.nom_entreprise}</h4>
+                        <p><strong>Entreprise:</strong> ${loc.nom_entreprise}</p>
+                        <p><strong>Ville:</strong> ${loc.ville_entreprise}</p>
+                        <p><strong>Latitude:</strong> ${loc.lat}</p>
+                        <p><strong>Longitude:</strong> ${loc.lng}</p>
+                    `;
+                    companyListDiv.appendChild(card);
+                });
+
+                // Afficher l'overlay
+                document.getElementById('overlay').style.display = 'block';
+                document.getElementById('map').style.width = '75%'; // Redimensionner la carte
+            });
+        }
+    });
+
+    // Ajouter un bouton pour fermer l'overlay
+    const closeOverlayButton = document.createElement('button');
+    closeOverlayButton.textContent = 'Fermer';
+    closeOverlayButton.style.position = 'absolute';
+    closeOverlayButton.style.top = '20px';
+    closeOverlayButton.style.left = '80%';
+    closeOverlayButton.style.zIndex = '1000';
+    closeOverlayButton.style.padding = '10px';
+    closeOverlayButton.addEventListener('click', function() {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('map').style.width = '100%'; // Rétablir la largeur de la carte
+    });
+    document.body.appendChild(closeOverlayButton);
+});
+
+
+</script>
+
+<style>
+
+#map {
+    height: 500px;
+    width: 75%;
+    float: left;
+    box-sizing: border-box;
+}
+
+#overlay {
+    height: 500px;
+    width: 25%;
+    float: left;
+    background-color: #f9f9f9;
+    padding: 20px;
+    box-sizing: border-box;
+    display: none;
+    position: relative;
+    overflow-y: auto;
+    border-left: 2px solid #ccc;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    background: #fff;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card h4 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+.card p {
+    margin: 0;
+    color: #555;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Empêche l'overlay de dépasser la hauteur de la carte */
+#overlay {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Style de la carte et de l'overlay quand l'overlay est ouvert */
+#map-wrapper {
+    display: flex;
+    width: 100%;
+    height: 500px;
+}
+
+#map-wrapper #map {
+    width: 75%; /* La carte prend 75% de la largeur de la fenêtre */
+}
+
+#map-wrapper #overlay {
+    width: 25%; /* L'overlay prend 25% de la largeur */
+    display: block;
+}
+
+</style>

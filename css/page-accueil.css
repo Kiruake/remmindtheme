@@ -292,3 +292,8 @@ body {
     padding: 85px;
     background-color: #002C40;
 }
+
+#map {
+    height: 500px; /* Hauteur de la carte */
+    width: 100%;  /* Largeur de la carte */
+}
