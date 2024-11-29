@@ -1,0 +1,142 @@
+/* Importer la police Montserrat */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #F1F1F7; /* Couleur de fond générale */
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* Section principale de l'article */
+.section-article {
+    background-color: #ffffff; /* Fond blanc pour l'article */
+    padding: 40px;
+    max-width: 80%; /* Largeur maximale pour centrer */
+    margin: 40px auto; /* Centrer avec marge en haut/bas */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Légère ombre */
+    border-radius: 10px; /* Coins arrondis */
+}
+
+.article-content-wrapper {
+    margin: 0 auto;
+}
+
+/* Titre principal */
+.article-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Introduction */
+.article-intro {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #555;
+}
+
+/* Métadonnées */
+.article-meta {
+    font-size: 0.9rem;
+    color: #888;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Images */
+.article-photo img {
+    max-width: 100%;
+    height: auto;
+    margin: 30px 0;
+    border-radius: 6px;
+}
+
+/* Sous-titres */
+.article-subtitle {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+/* Paragraphes */
+.article-paragraph {
+    font-size: 1rem;
+    margin-bottom: 30px;
+    line-height: 1.8;
+    text-align: justify;
+}
+
+/* Galerie d'images */
+.article-images {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.image-item {
+    display: inline-block;
+    margin: 15px;
+}
+
+.image-item img {
+    max-width: 300px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.image-caption {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 10px;
+}
+
+/* Boutons de partage */
+.share-buttons {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #eaeaea;
+    margin-bottom: -20px;
+}
+
+.share-buttons a {
+    display: inline-block;
+    margin: 0 10px;
+    transition: transform 0.3s ease;
+}
+
+.share-buttons a:hover {
+    transform: scale(1.1);
+}
+
+.share-buttons img {
+    width: 32px;
+    height: 32px;
+}
+
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .section-article {
+        padding: 20px;
+    }
+
+    .article-title {
+        font-size: 2rem;
+    }
+
+    .article-subtitle {
+        font-size: 1.5rem;
+    }
+
+    .image-item img {
+        max-width: 100%;
+    }
+}

@@ -1,0 +1,294 @@
+body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background-color: #F1F1F7;
+}
+
+.image-section {
+    width: 100vw;
+    margin-top: -10;
+    position: relative;
+    z-index: -1;
+}
+
+.yellow-band {
+    background-color: #FFCC00;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+    margin-top: -6;
+}
+
+/* Texte pour les membres */
+.alumni-text {
+    font-size: 18px; /* Taille du texte */
+    font-weight: 700;
+    color: #333333; /* Gris foncé */
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Bouton "Espace Membre" */
+.espace-membre {
+    display: inline-flex;
+    align-items: center;
+    background-color: #002C40;
+    color: #FFFFFF;
+    padding: 6px 10px;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    text-decoration: none;
+    border-radius: 30px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+/* Icône de cadenas dans le bouton */
+.espace-membre .icon-lock {
+    margin-left: 5px; /* Espacement entre le texte et l'icône */
+}
+
+/* Hover sur le bouton */
+.espace-membre:hover {
+    background-color: #005BB5; /* Bleu plus clair au survol */
+}
+
+
+.page-titleAccueil{
+    font-size: 2em;
+    text-transform: uppercase;
+    margin-bottom: 85px;
+    text-align: center;
+    margin-top: 85px;
+    font-family: 'Aristotelica Display Trial', sans-serif;
+}
+
+.page-titleArticle{
+    font-size: 2em;
+    text-transform: uppercase;
+    margin-bottom: 85px;
+    text-align: center;
+    color: white;
+    font-family: 'Aristotelica Display Trial', sans-serif;
+}
+
+.paragrapheAccueil {
+
+    text-align: center;
+    width: 75%;
+    margin: auto;
+    line-height: 130%;
+}
+
+
+.sectionStat {
+    display: flex;
+    justify-content: center;
+    gap: 7%;
+    margin-top:85px;
+}
+
+.cardStat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #002C40;
+    width: fit-content;
+    padding: 0px 15px;
+    color: white;
+}
+
+.cardStat2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #F4BB46 ;
+    width: fit-content;
+    padding: 0px 15px;
+    color: #002C40;
+}
+
+.cardStat p, .cardStat2 p {
+    text-align: center;
+    margin-top: -10;
+}
+
+.chiffreStat {
+    font-size: 40px;
+    margin: 20;
+}
+
+/* Grille des portraits */
+.portrait-archive-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    justify-content: center;
+}
+
+.portrait-item {
+    background-color: #fdfdfd;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 300px;
+    height: 410;
+}
+
+.portrait-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Photo du portrait */
+.portrait-photo img {
+    width: 260px;
+    height: 260px;
+    object-fit: cover;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+    margin-top: 20px;
+}
+
+/* Informations sur le portrait */
+.portrait-info {
+    padding: 10px;
+    text-align: center;
+}
+
+.portrait-name {
+    font-size: 23px;
+    font-weight: 700;
+    margin: 10px 0;
+    color: #333;
+}
+
+.portrait-metier {
+    font-weight: lighter;
+    font-size: 16px;
+}
+
+/* Détails supplémentaires */
+.portrait-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 20px;
+    font-size: 0.9em;
+}
+
+.portrait-age, .portrait-promo {
+    font-size: 12px;
+    font-weight: lighter;
+}
+
+.portrait-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Grille d'articles */
+.actualite-archive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+/* Style de chaque article */
+.actualite-item {
+    background-color: #fdfdfd;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+    max-height: 480px;
+    height: 480px;
+}
+
+.actualite-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Lien pour l'article */
+.actualite-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Image de l'article */
+.actualite-photo img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+}
+
+/* Informations principales */
+.actualite-info {
+   padding: 0px 20px 0px 20px;
+   font-size: 14px;
+}
+
+.actualite-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 15px 0;
+    color: #333;
+}
+
+.actualite-intro {
+    font-size: 1em;
+    font-weight: lighter;
+}
+
+/* Détails de l'article */
+.actualite-details {
+    padding: 5px 20px 0px 20px;
+    font-size: 0.9em;
+    color: #646262;
+}
+
+.actualite-author, .actualite-date {
+    display: block;
+    font-size: 12px;
+    color: #888;
+}
+
+
+
+.voir-plus-container {
+    text-align: center;
+    margin-top: 85px;
+}
+
+.voir-plus-button {
+    background-color: #F4BB46;
+    color: black;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0px 20px 85px 20px;
+}
+
+.containerArticle {
+    margin: 0 auto;
+    padding: 85px;
+    background-color: #002C40;
+}

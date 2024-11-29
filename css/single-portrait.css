@@ -1,0 +1,187 @@
+/* Assurez-vous que le box-sizing soit appliqué à tout le contenu */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    overflow-x: hidden; /* Empêche tout défilement horizontal global */
+    font-family: 'Montserrat', sans-serif;
+}
+
+.section-portrait {
+    display: flex;
+    gap: 60px;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto; /* Assurez-vous que la hauteur du conteneur s'adapte */
+}
+
+.portrait-left {
+    flex: 0 0 45%;
+    max-width: 45%;
+    position: sticky;
+    top: 0; /* Coller en haut de la fenêtre lorsqu'on fait défiler */
+    height: fit-content;
+    align-self: flex-start;
+}
+
+.portrait-left img {
+    width: 100%;
+    height: 100vh;
+    display: block;
+    object-fit: cover;
+}
+
+.portrait-right {
+    flex: 0 0 50%;
+    max-width: 50%;
+    margin-right: 20px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+
+.portrait-questions h4 {
+    font-weight: bold;
+}
+
+.portrait-right ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.portrait-right ul li {
+    margin-bottom: 10px;
+}
+
+.portrait-right ul li a {
+    text-decoration: none;
+    color: #0073e6;
+}
+
+.portrait-right ul li a:hover {
+    text-decoration: underline;
+}
+
+.portrait-right p {
+    font-size:16px;
+    font-weight: lighter;
+    line-height: 130%;
+    width: 90%;
+}
+
+
+.titre-promo {
+    font-size:20px;
+    font-weight: 600;
+    color:#7A7A7A;
+}
+
+.titre-nom {
+    font-size:35px;
+    font-weight: 600;
+}
+
+.questions {
+    font-weight: medium;
+    line-height: 130%;
+    font-size: 16px;
+    color: #002C40;
+}
+
+.sous-titre {
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.metiers {
+
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    width: 90%;
+    display: flex;
+    gap: 30px;
+
+}
+
+.metiers h2 {
+
+   font-size: 20px;
+    
+    }
+
+    .competence-container {
+        display: flex;
+        flex-wrap: wrap; /* Permet de passer à la ligne suivante si plus de 5 éléments */
+        gap: 10px; /* Espacement entre les compétences */
+        margin-top: 10px;
+    }
+    
+    .competence-item {
+        background-color: #F4BB46; /* Fond jaune */
+        color: #000; /* Texte noir */
+        padding: 5px 5px;
+        border-radius: 6px; /* Bords arrondis */
+        text-align: center;
+        width: 20%;
+        box-sizing: border-box;
+        white-space: nowrap; /* Empêche le texte de se déborder */
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+
+    .linkedin-icon, .portfolio-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .LinkedinPortfolio {
+        align-items: center;
+        display: flex;
+        gap: 20px;
+    }
+    
+
+    .none-temoignage {
+        text-align: center;
+        margin-top: 80px;
+        font-size: larger!important;
+        font-weight: 700!important;
+        color: #002C40;
+    }
+
+    /* Pour les petits écrans, ajuster la taille */
+    @media (max-width: 768px) {
+        .competence-item {
+            flex: 1 1 calc(50% - 10px); /* 2 compétences par ligne */
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .competence-item {
+            flex: 1 1 calc(100% - 10px); /* 1 compétence par ligne */
+        }
+    }
+    
+
+@media (max-width: 768px) {
+    .section-portrait {
+        flex-direction: column;
+        gap: 20px; /* Espacement réduit pour les petits écrans */
+        max-width: 100%;
+    }
+
+    .portrait-left,
+    .portrait-right {
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+}

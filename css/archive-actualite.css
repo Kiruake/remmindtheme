@@ -1,0 +1,94 @@
+body {
+    background-color: #F1F1F7;
+    font-family: 'Montserrat', sans-serif;
+    margin:0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.page-title {
+    font-size: 2.5em;
+    margin-bottom: 40px;
+    font-size: 2em;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+    font-family: 'Aristotelica Display Trial', sans-serif;
+}
+
+.article-archive-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.actualite-item {
+    background-color: #fdfdfd;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+    max-height: 480px;
+    height: 480px;
+}
+
+.actualite-item:hover {
+    transform: translateY(-5px);
+}
+
+.actualite-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.texteActualites {
+    font-family: 'Aristotelica Display Trial', sans-serif;
+    font-size: 2.5em;
+    color: #fff;
+}
+
+.actualite-archive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+
+
+.actualite-photo img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+}
+
+.actualite-info {
+   padding: 0px 20px 0px 20px;
+   font-size: 14px;
+
+}
+
+.actualite-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 15px 0;
+    color: #333;
+}
+
+.actualite-intro {
+    font-size: 1em;
+    font-weight: lighter;
+}
+
+.actualite-details {
+    padding: 5px 20px 0px 20px;
+    font-size: 0.9em;
+    color: #646262;
+}
