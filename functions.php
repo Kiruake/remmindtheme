@@ -84,8 +84,6 @@ function enqueue_leaflet_map() {
     // Ajouter le JS de Leaflet
     wp_enqueue_script('leaflet-js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', [], null, true);
 
-    // Ajouter un script personnalisé
-    wp_enqueue_script('custom-map-js', get_template_directory_uri() . '/js/custom-map.js', ['leaflet-js'], null, true);
 }
 add_action('wp_enqueue_scripts', 'enqueue_leaflet_map');
 

@@ -291,9 +291,136 @@ body {
     margin: 0 auto;
     padding: 85px;
     background-color: #002C40;
+    margin-bottom: 85px;
 }
 
-#map {
-    height: 500px; /* Hauteur de la carte */
-    width: 100%;  /* Largeur de la carte */
+/* Conteneur global pour la carte et l'overlay */
+#map-wrapper {
+    display: flex;
+    justify-content: center; 
+    position : relative;
+    align-items: center;     
+    margin: auto;
+    width: 90%;
+    height: 500px;
 }
+
+/* Carte */
+#map {
+    height: 100%;            
+    width: 90%;
+    box-sizing: border-box;
+}
+
+/* Overlay */
+#overlay {
+    height: 100%;
+    width: 30%;
+    background-color: #f9f9f9;
+    padding: 20px;
+    box-sizing: border-box;
+    display: none;
+    position: relative;
+    overflow-y: auto;
+    border-left: 2px solid #ccc;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    display: flex;
+    align-items: stretch; 
+    background: #fff;
+    width: 100%; 
+    height: 120px;
+    margin: 10px 0;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.card-left {
+    flex: 0 0 33%; 
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-right {
+    flex: 1; 
+    padding: 15px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.card-name {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.card-company {
+    margin: 0;
+    font-size: 16px;
+    color: #777;
+}
+
+.card-metier,
+.card-promotion {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #555;
+}
+
+
+.filter-container {
+        position: absolute;
+        top: 100px;
+        left: 10px;
+        background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent pour les filtres */
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000; /* Assurez-vous que les filtres soient au-dessus de la carte */
+        width: auto;
+        max-width: 300px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Style des labels des filtres */
+    .filter-container label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    /* Style des champs de sélection */
+    .filter-container select {
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        transition: border-color 0.3s ease;
+    }
+
+    .filter-container select:focus {
+        border-color: #002C40; /* Changement de couleur lors du focus */
+        outline: none;
+    }

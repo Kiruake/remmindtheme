@@ -46,7 +46,7 @@ get_header();
 
 <div class="container">
 
-<h1 class="page-titleAccueil">Les portraits des Alumnis</h1>
+<h1 class="page-titleAccueil">Les portraits des Alumni</h1>
 
 <div class="portrait-archive-grid">
     <?php
@@ -189,16 +189,32 @@ $locations = [];
 if ($query->have_posts()) {
     while ($query->have_posts()) {
         $query->the_post();
+
         $ville_entreprise = get_post_meta(get_the_ID(), 'ville_entreprise', true);
         $nom_entreprise = get_post_meta(get_the_ID(), 'nom_entreprise', true);
+        $photo_profil_id = get_post_meta(get_the_ID(), 'photo_profil', true); // ID ou URL stockée
+$photo_profil = wp_get_attachment_url($photo_profil_id); // Convertit en URL si c'est un ID
 
-        // Ajouter les informations à la liste
+
+
+
+        // Récupération des termes des taxonomies
+        $metier_terms = get_the_terms(get_the_ID(), 'metier'); // Remplacez "metier" par le slug de la taxonomy réelle
+        $promotion_terms = get_the_terms(get_the_ID(), 'promotion'); // Idem pour "promotion"
+
+        $metiers = $metier_terms ? wp_list_pluck($metier_terms, 'name') : [];
+        $promotions = $promotion_terms ? wp_list_pluck($promotion_terms, 'name') : [];
+
         if ($ville_entreprise && $nom_entreprise) {
             $locations[] = [
                 'nom_entreprise' => $nom_entreprise,
                 'ville_entreprise' => $ville_entreprise,
                 'lat' => get_post_meta(get_the_ID(), '_latitude', true),
                 'lng' => get_post_meta(get_the_ID(), '_longitude', true),
+                'nom_portrait' => get_the_title(),
+                'photo_profil' => $photo_profil,
+                'metiers' => $metiers,  // Liste des métiers
+                'promotions' => $promotions, // Liste des promotions
             ];
         }
     }
@@ -206,11 +222,32 @@ if ($query->have_posts()) {
 wp_reset_postdata();
 ?>
 
-<div id="map" style="height: 500px; width: 75%; float: left;"></div>
-<div id="overlay" style="height: 500px; width: 25%; float: left; background-color: #f4f4f4; padding: 20px; display: none;">
-    <h3>Entreprises dans la ville </h3>
-    <div id="company-list"></div>
+<h1 class="page-titleAccueil">Carte des anciens MMI : Où sont-ils maintenant ?</h1>
+
+
+
+
+<div id="map-wrapper">
+    <div id="map">
+    <div class="filter-container">
+        <select id="city-filter">
+            <option value="">Sélectionnez une ville</option>
+            <!-- Options seront ajoutées dynamiquement -->
+        </select>
+    
+        <select id="promotion-filter">
+            <option value="">Sélectionnez une promotion</option>
+            <!-- Options seront ajoutées dynamiquement -->
+        </select>
+        </div>
+    </div>
+    <div id="overlay">
+        <h3>MMi présents à</h3>
+        <div id="company-list"></div>
+    </div>
 </div>
+
+
 
 
 
@@ -225,93 +262,195 @@ wp_reset_postdata();
 document.addEventListener('DOMContentLoaded', function () {
     const map = L.map('map').setView([48.8566, 2.3522], 5); // Centré sur la France
 
-    // Ajouter la couche OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://carto.com/">CartoDB</a>'
     }).addTo(map);
 
     // Liste des entreprises avec leurs coordonnées
     const locations = <?php echo json_encode($locations); ?>;
 
-    // Créer un objet pour organiser les entreprises par ville
+    // Créer un objet pour organiser les entreprises par ville et promotion
     const cities = {};
+    const promotions = {};
 
     locations.forEach(location => {
         if (location.lat && location.lng) {
             const city = location.ville_entreprise;
+            const promo = location.promotions ? location.promotions.join(', ') : ''; // Promotion(s) des entreprises
+            
+            // Ajouter la ville
             if (!cities[city]) {
                 cities[city] = [];
             }
             cities[city].push(location);
+
+            // Ajouter la promotion
+            if (promo) {
+                if (!promotions[promo]) {
+                    promotions[promo] = [];
+                }
+                promotions[promo].push(location);
+            }
         }
     });
 
-    // Ajouter un marqueur pour chaque entreprise
-    locations.forEach(location => {
-        if (location.lat && location.lng) {
+    // Remplir les filtres par ville et promotion
+    const cityFilter = document.getElementById('city-filter');
+    const promoFilter = document.getElementById('promotion-filter');
+
+
+    // Remplir le filtre des villes
+    Object.keys(cities).forEach(city => {
+        const option = document.createElement('option');
+        option.value = city;
+        option.textContent = city;
+        cityFilter.appendChild(option);
+    });
+
+    // Remplir le filtre des promotions
+    Object.keys(promotions).forEach(promo => {
+        const option = document.createElement('option');
+        option.value = promo;
+        option.textContent = promo;
+        promoFilter.appendChild(option);
+    });
+
+    // Fonction pour mettre à jour la carte avec les filtres
+    function updateMap() {
+        const selectedCity = cityFilter.value;
+        const selectedPromo = promoFilter.value;
+
+        // Supprimer tous les marqueurs existants
+        map.eachLayer(function(layer) {
+            if (layer instanceof L.Marker) {
+                map.removeLayer(layer);
+            }
+        });
+
+        // Fermer l'overlay avant de mettre à jour
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('map').style.width = '100%'; // Revenir à la taille d'origine de la carte
+
+        // Filtrer les locations en fonction des filtres sélectionnés
+        const filteredLocations = locations.filter(location => {
+            const matchesCity = selectedCity ? location.ville_entreprise === selectedCity : true;
+            const matchesPromo = selectedPromo ? location.promotions.includes(selectedPromo) : true;
+            return matchesCity && matchesPromo;
+        });
+
+        // Ajouter les marqueurs filtrés sur la carte
+        filteredLocations.forEach(location => {
             const marker = L.marker([location.lat, location.lng]).addTo(map);
 
             // Lier un événement au marqueur pour afficher l'overlay
             marker.on('click', function() {
                 const city = location.ville_entreprise; // Récupérer la ville du marqueur cliqué
+                const selectedPromo = promoFilter.value; // Récupérer la promotion sélectionnée
                 const cityLocations = cities[city]; // Filtrer les entreprises de cette ville
 
-                // Mettre à jour l'overlay avec la liste des entreprises de cette ville
+                // Filtrer les profils de la ville par la promotion sélectionnée
+                const filteredCityLocations = cityLocations.filter(loc => {
+                    // Si une promotion est sélectionnée, vérifier si cette promotion existe dans le profil
+                    if (selectedPromo) {
+                        return loc.promotions && loc.promotions.includes(selectedPromo);
+                    }
+                    return true; // Si aucune promotion n'est sélectionnée, on retourne tous les profils de la ville
+                });
+
+                filteredCityLocations.sort((a, b) => a.nom_portrait.localeCompare(b.nom_portrait));
+
+                // Mettre à jour le titre de l'overlay avec le nom de la ville
+                document.querySelector('#overlay h3').textContent = `MMI présents à ${city}`;
+
+                // Mettre à jour l'overlay avec la liste des entreprises et des noms associés
                 const companyListDiv = document.getElementById('company-list');
                 companyListDiv.innerHTML = ''; // Vider le contenu précédent
 
-                // Afficher les entreprises dans l'overlay
-                cityLocations.forEach(loc => {
+                filteredCityLocations.forEach(loc => {
+                    const imgTag = loc.photo_profil
+                        ? `<img src="${loc.photo_profil}" alt="Photo de ${loc.nom_portrait}" class="profile-photo">`
+                        : '';
+
+                    const metiers = loc.metiers.length
+                        ? `<p class="card-metier">${loc.metiers.join(', ')}</p>`
+                        : '';
+
+                    const promotions = loc.promotions.length
+                        ? `<p class="card-promotion">Promotion : ${loc.promotions.join(', ')}</p>`
+                        : '';
+                        
                     const card = document.createElement('div');
                     card.className = 'card';
                     card.innerHTML = `
-                        <h4>${loc.nom_entreprise}</h4>
-                        <p><strong>Entreprise:</strong> ${loc.nom_entreprise}</p>
-                        <p><strong>Ville:</strong> ${loc.ville_entreprise}</p>
-                        <p><strong>Latitude:</strong> ${loc.lat}</p>
-                        <p><strong>Longitude:</strong> ${loc.lng}</p>
+                        <div class="card-left">
+                            ${imgTag}
+                        </div>
+                        <div class="card-right">
+                            <div class="card-header">
+                                <h4 class="card-name">${loc.nom_portrait}</h4>
+                                <p class="card-company">${loc.nom_entreprise}</p>
+                            </div>
+                            ${metiers}
+                            ${promotions}
+                        </div>
                     `;
                     companyListDiv.appendChild(card);
                 });
 
-                // Afficher l'overlay
+                // Réouvrir l'overlay
                 document.getElementById('overlay').style.display = 'block';
                 document.getElementById('map').style.width = '75%'; // Redimensionner la carte
             });
-        }
-    });
+        });
+    }
 
-    // Ajouter un bouton pour fermer l'overlay
-    const closeOverlayButton = document.createElement('button');
-    closeOverlayButton.textContent = 'Fermer';
-    closeOverlayButton.style.position = 'absolute';
-    closeOverlayButton.style.top = '20px';
-    closeOverlayButton.style.left = '80%';
-    closeOverlayButton.style.zIndex = '1000';
-    closeOverlayButton.style.padding = '10px';
-    closeOverlayButton.addEventListener('click', function() {
+    // Fonction pour fermer l'overlay dès que les filtres sont appliqués
+    function closeOverlay() {
         document.getElementById('overlay').style.display = 'none';
-        document.getElementById('map').style.width = '100%'; // Rétablir la largeur de la carte
+        document.getElementById('map').style.width = '100%'; // Revenir à la taille d'origine de la carte
+    }
+
+    // Initialiser la carte avec tous les marqueurs
+    updateMap();
+
+
+    // Fermer l'overlay lors du changement de filtre
+    cityFilter.addEventListener('change', function() {
+        closeOverlay(); // Fermer l'overlay
+        updateMap(); // Mettre à jour les marqueurs
     });
-    document.body.appendChild(closeOverlayButton);
+
+    promoFilter.addEventListener('change', function() {
+        closeOverlay(); // Fermer l'overlay
+        updateMap(); // Mettre à jour les marqueurs
+    });
 });
-
-
 </script>
 
 <style>
 
-#map {
+/* Conteneur global pour la carte et l'overlay */
+#map-wrapper {
+    display: flex;
+    justify-content: center; 
+    position : relative;
+    align-items: center;     
+    margin: auto;
+    width: 90%;
     height: 500px;
-    width: 75%;
-    float: left;
+}
+
+/* Carte */
+#map {
+    height: 100%;            
+    width: 90%;
     box-sizing: border-box;
 }
 
+/* Overlay */
 #overlay {
-    height: 500px;
-    width: 25%;
-    float: left;
+    height: 100%;
+    width: 30%;
     background-color: #f9f9f9;
     padding: 20px;
     box-sizing: border-box;
@@ -323,56 +462,103 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 
 .card {
+    display: flex;
+    align-items: stretch; 
     background: #fff;
-    padding: 15px;
+    width: 100%; 
+    height: 120px;
     margin: 10px 0;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
-.card h4 {
-    margin: 0 0 10px;
-    font-size: 18px;
+.card-left {
+    flex: 0 0 33%; 
+    display: flex; 
+    align-items: center;
+    justify-content: center;
 }
 
-.card p {
+.profile-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-right {
+    flex: 1; 
+    padding: 15px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.card-name {
     margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.card-company {
+    margin: 0;
+    font-size: 16px;
+    color: #777;
+}
+
+.card-metier,
+.card-promotion {
+    margin: 5px 0;
+    font-size: 14px;
     color: #555;
 }
 
-button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px;
-    margin: 10px;
-    cursor: pointer;
-}
 
-button:hover {
-    background-color: #45a049;
-}
+.filter-container {
+        position: absolute;
+        top: 100px;
+        left: 10px;
+        background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent pour les filtres */
+        border-radius: 8px;
+        padding: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000; /* Assurez-vous que les filtres soient au-dessus de la carte */
+        width: auto;
+        max-width: 300px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
 
-/* Empêche l'overlay de dépasser la hauteur de la carte */
-#overlay {
-    max-height: 500px;
-    overflow-y: auto;
-}
+    /* Style des labels des filtres */
+    .filter-container label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 14px;
+        color: #333;
+    }
 
-/* Style de la carte et de l'overlay quand l'overlay est ouvert */
-#map-wrapper {
-    display: flex;
-    width: 100%;
-    height: 500px;
-}
+    /* Style des champs de sélection */
+    .filter-container select {
+        padding: 8px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        transition: border-color 0.3s ease;
+    }
 
-#map-wrapper #map {
-    width: 75%; /* La carte prend 75% de la largeur de la fenêtre */
-}
-
-#map-wrapper #overlay {
-    width: 25%; /* L'overlay prend 25% de la largeur */
-    display: block;
-}
+    .filter-container select:focus {
+        border-color: #002C40; /* Changement de couleur lors du focus */
+        outline: none;
+    }
 
 </style>
+
