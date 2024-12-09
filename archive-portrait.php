@@ -64,7 +64,7 @@
     // Préparer la requête WP_Query avec les filtres et la recherche
     $args = array(
         'post_type' => 'portrait',
-        'posts_per_page' => 9,
+        'posts_per_page' => 12,
         's' => $search_query,
         'tax_query' => array(
             'relation' => 'AND',

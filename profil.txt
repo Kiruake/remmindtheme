@@ -1,0 +1,406 @@
+<?php get_header(); ?>  
+
+<?php
+// Lien pour la déconnexion
+echo '<a href="' . wp_logout_url() . '"><p>Se déconnecter</p></a>';
+
+// Vérification de la connexion
+if (is_user_logged_in()) {
+    $user_id = get_current_user_id();
+
+    // Vérification si un portrait existe déjà pour cet utilisateur
+    $existing_portrait = get_posts([
+        'post_type' => 'portrait',
+        'meta_key' => 'attributed_user', // Lier le portrait à l'utilisateur
+        'meta_value' => $user_id
+    ]);
+
+    if ($existing_portrait) {
+        // Si un portrait existe, afficher un message et le lien pour modifier
+        echo '<p>Vous avez déjà un portrait. Vous pouvez le modifier ci-dessous.</p>';
+
+        // Code pour afficher le formulaire de modification du portrait
+        $portrait_id = $existing_portrait[0]->ID;
+        $prenom = get_field('prenom', $portrait_id);
+        $nom = get_field('nom', $portrait_id);
+        $ville_entreprise = get_field('ville_entreprise', $portrait_id);
+        $nom_entreprise = get_field('nom_entreprise', $portrait_id);
+        $age = get_field('age', $portrait_id);
+        $photo_profil = get_field('photo_profil', $portrait_id);
+        $presentation = get_field('presentation', $portrait_id);
+        $competences = get_the_terms($portrait_id, 'competence');
+        $metier = get_the_terms($portrait_id, 'metier');
+        $promotion = get_the_terms($portrait_id, 'promotion');
+
+        // Formulaire pour mettre à jour le portrait
+        ?>
+        
+        <form action="" method="post" enctype="multipart/form-data">
+            <label for="prenom">Prénom</label>
+            <input type="text" id="prenom" name="prenom" value="<?php echo esc_attr($prenom); ?>" required>
+
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" name="nom" value="<?php echo esc_attr($nom); ?>" required>
+
+            <label for="age">Âge</label>
+            <input type="number" id="age" name="age" value="<?php echo esc_attr($age); ?>" required>
+
+            <label for="ville_entreprise">Ville</label>
+            <input type="text" id="ville_entreprise" name="ville_entreprise" value="<?php echo esc_attr($ville_entreprise); ?>" required>
+
+            <label for="nom_entreprise">Nom de l'entreprise</label>
+            <input type="text" id="nom_entreprise" name="nom_entreprise" value="<?php echo esc_attr($nom_entreprise); ?>" required>
+
+            <label for="photo_profil">Photo de Profil</label>
+            <?php if ($photo_profil) : ?>
+                <img src="<?php echo esc_url($photo_profil['url']); ?>" alt="Photo de profil actuelle" width="100">
+                <br>
+            <?php endif; ?>
+            <input type="file" id="photo_profil" name="photo_profil" accept="image/*">
+
+            <label for="presentation">Présentation</label>
+            <textarea id="presentation" name="presentation"><?php echo esc_textarea($presentation); ?></textarea>
+
+            <label for="competences">Compétences</label>
+<div class="taxonomies-container">
+    <?php
+    $competences_terms = get_terms(['taxonomy' => 'competence', 'orderby' => 'name']);
+    if ($competences_terms) {
+        foreach ($competences_terms as $competence) {
+            $checked = (in_array($competence->slug, wp_list_pluck($competences, 'slug'))) ? 'checked' : '';
+            echo '<input type="checkbox" name="competences[]" value="' . esc_attr($competence->slug) . '" ' . $checked . '>' . esc_html($competence->name) . '<br>';
+        }
+    }
+    ?>
+</div>
+
+<label for="metier">Métier</label>
+<div class="taxonomies-container">
+    <?php
+    $metiers_terms = get_terms(['taxonomy' => 'metier', 'orderby' => 'name']);
+    if ($metiers_terms) {
+        foreach ($metiers_terms as $metier_term) {
+            $checked = (in_array($metier_term->slug, wp_list_pluck($metier, 'slug'))) ? 'checked' : '';
+            echo '<input type="radio" name="metier" value="' . esc_attr($metier_term->slug) . '" ' . $checked . '>' . esc_html($metier_term->name) . '<br>';
+        }
+    }
+    ?>
+</div>
+
+<label for="promotion">Promotion</label>
+<div class="taxonomies-container">
+    <?php
+    $promotions_terms = get_terms(['taxonomy' => 'promotion', 'orderby' => 'name']);
+    if ($promotions_terms) {
+        foreach ($promotions_terms as $promotion_term) {
+            $checked = (in_array($promotion_term->slug, wp_list_pluck($promotion, 'slug'))) ? 'checked' : '';
+            echo '<input type="checkbox" name="promotion[]" value="' . esc_attr($promotion_term->slug) . '" ' . $checked . '>' . esc_html($promotion_term->name) . '<br>';
+        }
+    }
+    ?>
+</div>
+
+
+            <button type="submit" name="submit_portrait">Mettre à jour mon portrait</button>
+        </form>
+
+        <?php
+        // Traitement du formulaire pour la mise à jour
+        if (isset($_POST['submit_portrait'])) {
+            $prenom = sanitize_text_field($_POST['prenom']);
+            $nom = sanitize_text_field($_POST['nom']);
+            $ville_entreprise = sanitize_text_field($_POST['ville_entreprise']);
+            $nom_entreprise = sanitize_text_field($_POST['nom_entreprise']);
+            $age = intval($_POST['age']);
+            $photo_profil = $_FILES['photo_profil'];
+            $presentation = sanitize_textarea_field($_POST['presentation']);
+            $competences = isset($_POST['competences']) ? $_POST['competences'] : [];
+            $metier = isset($_POST['metier']) ? $_POST['metier'] : '';
+            $promotion = isset($_POST['promotion']) ? $_POST['promotion'] : [];
+
+            // Mise à jour du portrait existant
+            $post_id = $portrait_id;
+
+            wp_update_post([
+                'ID' => $post_id,
+                'post_title' => $prenom . ' ' . $nom,
+                'post_status' => 'publish',
+                'meta_input' => [
+                    'attributed_user' => $user_id,
+                    'prenom' => $prenom,
+                    'nom' => $nom,
+                    'age' => $age,
+                    'ville_entreprise' => $ville_entreprise,
+                    'nom_entreprise' => $nom_entreprise,
+                    'presentation' => $presentation
+                ]
+            ]);
+
+            if ($photo_profil && !empty($photo_profil['tmp_name'])) {
+                // Vérification du type de fichier
+                $file_type = wp_check_filetype($photo_profil['name']);
+                if (!in_array($file_type['ext'], ['jpg', 'jpeg', 'png', 'gif'])) {
+                    echo 'Type de fichier non autorisé.';
+                    exit;
+                }
+                
+                // Traitement de l'upload de l'image
+                $attachment_id = media_handle_upload('photo_profil', $post_id);
+                if (is_wp_error($attachment_id)) {
+                    // Afficher un message d'erreur si l'upload échoue
+                    echo 'Erreur d\'upload de l\'image : ' . $attachment_id->get_error_message();
+                    exit;
+                } else {
+                    // Mise à jour du champ ACF avec l'ID de l'image (si tableau d'image est utilisé)
+                    update_post_meta($post_id, 'photo_profil', $attachment_id);
+                }
+            }
+            
+
+            // Mettre à jour les taxonomies
+            if ($competences) {
+                wp_set_object_terms($post_id, $competences, 'competence');
+            }
+            if ($metier) {
+                wp_set_object_terms($post_id, $metier, 'metier');
+            }
+            if ($promotion) {
+                wp_set_object_terms($post_id, $promotion, 'promotion');
+            }
+
+            wp_redirect(get_permalink($post_id));
+            exit;
+        }
+
+    } else {
+        // Si aucun portrait n'existe, afficher le formulaire de création
+        ?>
+        <form action="" method="post" enctype="multipart/form-data">
+            <label for="prenom">Prénom</label>
+            <input type="text" id="prenom" name="prenom" required>
+
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" name="nom" required>
+
+            <label for="age">Âge</label>
+            <input type="number" id="age" name="age" required>
+
+            <label for="ville_entreprise">Ville</label>
+            <input type="text" id="ville_entreprise" name="ville_entreprise" required>
+
+            <label for="nom_entreprise">Nom de l'entreprise</label>
+            <input type="text" id="nom_entreprise" name="nom_entreprise" required>
+
+            <label for="photo_profil">Photo de Profil</label>
+            <input type="file" id="photo_profil" name="photo_profil" accept="image/*">
+
+            <label for="presentation">Présentation</label>
+            <textarea id="presentation" name="presentation"></textarea>
+
+            <label for="competences">Compétences</label>
+            <?php
+            $competences_terms = get_terms(['taxonomy' => 'competence', 'orderby' => 'name']);
+            if ($competences_terms) {
+                foreach ($competences_terms as $competence) {
+                    echo '<input type="checkbox" name="competences[]" value="' . esc_attr($competence->slug) . '">' . esc_html($competence->name) . '<br>';
+                }
+            }
+            ?>
+
+            <label for="metier">Métier</label>
+            <?php
+            $metiers_terms = get_terms(['taxonomy' => 'metier', 'orderby' => 'name']);
+            if ($metiers_terms) {
+                foreach ($metiers_terms as $metier) {
+                    echo '<input type="radio" name="metier" value="' . esc_attr($metier->slug) . '">' . esc_html($metier->name) . '<br>';
+                }
+            }
+            ?>
+
+            <label for="promotion">Promotion</label>
+            <?php
+            $promotions_terms = get_terms(['taxonomy' => 'promotion', 'orderby' => 'name']);
+            if ($promotions_terms) {
+                foreach ($promotions_terms as $promotion) {
+                    echo '<input type="checkbox" name="promotion[]" value="' . esc_attr($promotion->slug) . '">' . esc_html($promotion->name) . '<br>';
+                }
+            }
+            ?>
+
+            <button type="submit" name="submit_portrait">Créer mon portrait</button>
+        </form>
+
+        <?php
+        // Traitement du formulaire pour la création
+        if (isset($_POST['submit_portrait'])) {
+            $prenom = sanitize_text_field($_POST['prenom']);
+            $nom = sanitize_text_field($_POST['nom']);
+            $ville_entreprise = sanitize_text_field($_POST['ville_entreprise']);
+            $nom_entreprise = sanitize_text_field($_POST['nom_entreprise']);
+            $age = intval($_POST['age']);
+            $photo_profil = $_FILES['photo_profil'];
+            $presentation = sanitize_textarea_field($_POST['presentation']);
+            $competences = isset($_POST['competences']) ? $_POST['competences'] : [];
+            $metier = isset($_POST['metier']) ? $_POST['metier'] : '';
+            $promotion = isset($_POST['promotion']) ? $_POST['promotion'] : [];
+
+            // Créer un nouveau portrait
+            $post_id = wp_insert_post([
+                'post_type' => 'portrait',
+                'post_status' => 'publish',
+                'post_title' => $prenom . ' ' . $nom,
+                'meta_input' => [
+                    'attributed_user' => $user_id,
+                    'prenom' => $prenom,
+                    'nom' => $nom,
+                    'age' => $age,
+                    'ville_entreprise' => $ville_entreprise,
+                    'nom_entreprise' => $nom_entreprise,
+                    'presentation' => $presentation
+                ]
+            ]);
+
+            // Ajouter la photo de profil
+            if ($photo_profil && !empty($photo_profil['tmp_name'])) {
+                $attachment_id = media_handle_upload('photo_profil', $post_id);
+                if (!is_wp_error($attachment_id)) {
+                    update_post_meta($post_id, 'photo_profil', $attachment_id);
+                }
+            }
+
+            // Associer les taxonomies
+            if ($competences) {
+                wp_set_object_terms($post_id, $competences, 'competence');
+            }
+            if ($metier) {
+                wp_set_object_terms($post_id, $metier, 'metier');
+            }
+            if ($promotion) {
+                wp_set_object_terms($post_id, $promotion, 'promotion');
+            }
+
+            wp_redirect(get_permalink($post_id));
+            exit;
+        }
+    }
+} else {
+    echo '<p>Vous devez être connecté pour créer ou mettre à jour un portrait.</p>';
+}
+?>
+
+<style>
+
+/* Style global pour le body */
+body {
+    background-color: #F1F1F7;
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Centrer le formulaire sur la page */
+form {
+    width: 100%;
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Titres des champs */
+form label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Champs de saisie */
+form input[type="text"],
+form input[type="number"],
+form input[type="file"],
+form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s;
+}
+
+/* Ajout d'un effet au focus */
+form input[type="text"]:focus,
+form input[type="number"]:focus,
+form input[type="file"]:focus,
+form textarea:focus {
+    border-color: #0056b3;
+    outline: none;
+}
+
+/* Styles pour les cases à cocher et les boutons radio */
+form input[type="checkbox"],
+form input[type="radio"] {
+    margin-right: 10px;
+}
+
+/* Styliser les boutons */
+form button {
+    background-color: #0056b3;
+    display: block;
+    margin: 0 auto;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Effet au survol du bouton */
+form button:hover {
+    background-color: #004085;
+}
+
+/* Ajouter une image de profil stylisée */
+form img {
+    border-radius: 50%;
+    max-width: 100px;
+    margin-bottom: 10px;
+}
+
+/* Scrollable pour les listes de taxonomies */
+form label + .taxonomies-container {
+    max-height: 100px;
+    overflow-y: auto;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #F9F9F9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Styles pour la liste de taxonomies */
+form .taxonomies-container input {
+    margin-bottom: 5px;
+}
+
+/* Champs de texte (textarea) */
+form textarea {
+    min-height: 100px;
+    resize: vertical; /* Permet de redimensionner la zone de texte verticalement */
+}
+
+/* Séparer chaque section du formulaire avec un espace */
+form label + input,
+form label + textarea {
+    margin-top: 10px;
+}
+
+
+</style>

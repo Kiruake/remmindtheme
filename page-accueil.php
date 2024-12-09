@@ -269,6 +269,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Liste des entreprises avec leurs coordonnées
     const locations = <?php echo json_encode($locations); ?>;
 
+    // Créer une couche de groupe pour les marqueurs
+    const markerGroup = L.featureGroup().addTo(map);
+
     // Créer un objet pour organiser les entreprises par ville et promotion
     const cities = {};
     const promotions = {};
@@ -277,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (location.lat && location.lng) {
             const city = location.ville_entreprise;
             const promo = location.promotions ? location.promotions.join(', ') : ''; // Promotion(s) des entreprises
-            
+
             // Ajouter la ville
             if (!cities[city]) {
                 cities[city] = [];
@@ -298,8 +301,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const cityFilter = document.getElementById('city-filter');
     const promoFilter = document.getElementById('promotion-filter');
 
-
-    // Remplir le filtre des villes
     Object.keys(cities).forEach(city => {
         const option = document.createElement('option');
         option.value = city;
@@ -307,7 +308,6 @@ document.addEventListener('DOMContentLoaded', function () {
         cityFilter.appendChild(option);
     });
 
-    // Remplir le filtre des promotions
     Object.keys(promotions).forEach(promo => {
         const option = document.createElement('option');
         option.value = promo;
@@ -321,15 +321,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedPromo = promoFilter.value;
 
         // Supprimer tous les marqueurs existants
-        map.eachLayer(function(layer) {
-            if (layer instanceof L.Marker) {
-                map.removeLayer(layer);
-            }
-        });
-
-        // Fermer l'overlay avant de mettre à jour
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('map').style.width = '100%'; // Revenir à la taille d'origine de la carte
+        markerGroup.clearLayers();
 
         // Filtrer les locations en fonction des filtres sélectionnés
         const filteredLocations = locations.filter(location => {
@@ -340,31 +332,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Ajouter les marqueurs filtrés sur la carte
         filteredLocations.forEach(location => {
-            const marker = L.marker([location.lat, location.lng]).addTo(map);
+            const marker = L.marker([location.lat, location.lng]).addTo(markerGroup);
 
             // Lier un événement au marqueur pour afficher l'overlay
-            marker.on('click', function() {
+            marker.on('click', function () {
                 const city = location.ville_entreprise; // Récupérer la ville du marqueur cliqué
                 const selectedPromo = promoFilter.value; // Récupérer la promotion sélectionnée
                 const cityLocations = cities[city]; // Filtrer les entreprises de cette ville
 
                 // Filtrer les profils de la ville par la promotion sélectionnée
                 const filteredCityLocations = cityLocations.filter(loc => {
-                    // Si une promotion est sélectionnée, vérifier si cette promotion existe dans le profil
                     if (selectedPromo) {
                         return loc.promotions && loc.promotions.includes(selectedPromo);
                     }
-                    return true; // Si aucune promotion n'est sélectionnée, on retourne tous les profils de la ville
+                    return true;
                 });
 
                 filteredCityLocations.sort((a, b) => a.nom_portrait.localeCompare(b.nom_portrait));
 
-                // Mettre à jour le titre de l'overlay avec le nom de la ville
+                // Mettre à jour l'overlay
                 document.querySelector('#overlay h3').textContent = `MMI présents à ${city}`;
-
-                // Mettre à jour l'overlay avec la liste des entreprises et des noms associés
                 const companyListDiv = document.getElementById('company-list');
-                companyListDiv.innerHTML = ''; // Vider le contenu précédent
+                companyListDiv.innerHTML = '';
 
                 filteredCityLocations.forEach(loc => {
                     const imgTag = loc.photo_profil
@@ -378,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const promotions = loc.promotions.length
                         ? `<p class="card-promotion">Promotion : ${loc.promotions.join(', ')}</p>`
                         : '';
-                        
+
                     const card = document.createElement('div');
                     card.className = 'card';
                     card.innerHTML = `
@@ -397,34 +386,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     companyListDiv.appendChild(card);
                 });
 
-                // Réouvrir l'overlay
                 document.getElementById('overlay').style.display = 'block';
-                document.getElementById('map').style.width = '75%'; // Redimensionner la carte
+                document.getElementById('map').style.width = '75%';
             });
         });
-    }
 
-    // Fonction pour fermer l'overlay dès que les filtres sont appliqués
-    function closeOverlay() {
-        document.getElementById('overlay').style.display = 'none';
-        document.getElementById('map').style.width = '100%'; // Revenir à la taille d'origine de la carte
+        // Ajuster la vue de la carte pour englober tous les marqueurs
+        if (filteredLocations.length > 0) {
+            const bounds = markerGroup.getBounds();
+            map.fitBounds(bounds, { padding: [20, 20] }); // Zoom pour afficher tous les marqueurs
+        }
     }
 
     // Initialiser la carte avec tous les marqueurs
     updateMap();
 
-
     // Fermer l'overlay lors du changement de filtre
-    cityFilter.addEventListener('change', function() {
-        closeOverlay(); // Fermer l'overlay
-        updateMap(); // Mettre à jour les marqueurs
-    });
-
-    promoFilter.addEventListener('change', function() {
-        closeOverlay(); // Fermer l'overlay
-        updateMap(); // Mettre à jour les marqueurs
-    });
+    cityFilter.addEventListener('change', updateMap);
+    promoFilter.addEventListener('change', updateMap);
 });
+
 </script>
 
 <style>

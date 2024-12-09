@@ -14,7 +14,25 @@ get_header();
         $publish_date = get_the_date(); 
     ?>
 
-    <h1>Articles</h1>
+<?php
+// Récupérer les étiquettes de l'article
+$tags = get_the_tags();
+$tag_name = $tags ? $tags[0]->name : ''; // Utiliser la première étiquette (ou une chaîne vide si aucune n'est disponible)
+$tag_link = $tags ? get_tag_link($tags[0]->term_id) : ''; // Récupérer le lien de l'étiquette
+
+// Lien vers la page d'archive des actualités (archive-actualite.php)
+$archive_actualite_url = get_post_type_archive_link('actualite'); // Modifier avec le slug de votre CPT si nécessaire
+
+// Construire le titre dynamique
+$title_dynamic = '<a href="' . esc_url($archive_actualite_url) . '" class="archive-link">articles</a>'; // Lien vers la page d'archive
+if ($tag_name) {
+    $title_dynamic .= ' · <a href="' . esc_url($tag_link) . '" class="tag-link">' . esc_html($tag_name) . '</a>'; // Ajouter le lien de l'étiquette si disponible
+}
+
+// Afficher le titre
+echo '<h1 class="SingleTag-title">' . $title_dynamic . '</h1>';
+?>
+
 
     <!-- Section principale de l'article -->
     <section class="section-article">

@@ -1,0 +1,51 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #F1F1F7; /* Couleur de fond générale */
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* Conteneur général pour centraliser le contenu */
+
+
+/* Style du titre principal */
+.legal-title {
+    font-size: 2.5rem;
+    color: #002C40;
+    margin-bottom: 20px;
+    margin-top: 40px;
+    text-align: center;
+    font-family : 'Aristotelica Display Trial', sans-serif;
+}
+
+/* Section principale de l'article */
+.section-legale {
+    background-color: #ffffff; /* Fond blanc pour l'article */
+    padding: 40px;
+    max-width: 80%; /* Largeur maximale pour centrer */
+    margin: 20px auto; /* Centrer avec marge en haut/bas */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Légère ombre */
+    border-radius: 10px; /* Coins arrondis */
+    text-align: justify; /* Texte justifié */
+}
+
+/* Style des titres de section */
+.section-legale h1 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #002C40;
+    font-family : 'Aristotelica Display Trial', sans-serif;
+}
+
+/* Style des liens */
+a {
+    color: #002C40;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #005A80; /* Couleur au survol */
+}

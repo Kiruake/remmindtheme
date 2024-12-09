@@ -10,6 +10,13 @@ body {
     line-height: 1.6;
 }
 
+.container-legale {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
 /* Section principale de l'article */
 .section-article {
     background-color: #ffffff; /* Fond blanc pour l'article */
@@ -31,7 +38,35 @@ body {
     color: #222;
     margin-bottom: 20px;
     text-align: center;
+    font-family : 'Aristotelica Display Trial', sans-serif;
 }
+
+.SingleTag-title {
+    font-size: 1.7rem;
+    font-family: 'Aristotelica Display Trial', sans-serif;
+    font-weight: 700;
+    color: #002C40;
+    text-transform: uppercase;
+}
+
+.SingleTag-title a {
+    color: #002C40; /* Couleur des liens */
+    text-decoration: none;
+}
+
+.SingleTag-title a:hover {
+    text-decoration: underline; /* Soulignement au survol */
+}
+
+.archive-link {
+    font-weight: bold;
+}
+
+.tag-link {
+    font-style: italic;
+
+}
+
 
 /* Introduction */
 .article-intro {
