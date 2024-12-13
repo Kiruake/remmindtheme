@@ -59,6 +59,20 @@ get_header(); ?>
                         <div class="actualite-details">
                             <!-- Afficher l'auteur et la date -->
                             <span class="actualite-author">Écrit par <?php the_author(); ?></span>
+
+                            <!-- Afficher les tags sous forme de boutons -->
+                            <?php
+                            // Utiliser get_the_terms pour récupérer les tags
+                            $tags = get_the_terms(get_the_ID(), 'post_tag');
+                            if ($tags && !is_wp_error($tags)) :
+                                echo '<div class="actualite-tags">';
+                                foreach ($tags as $tag) {
+                                    // Utiliser un span au lieu d'un lien
+                                    echo '<span class="tag-button">' . esc_html($tag->name) . '</span> ';
+                                }
+                                echo '</div>';
+                            endif;
+                            ?>
                         </div>
                     </a>
                 </article>
@@ -81,3 +95,4 @@ get_header(); ?>
 </div>
 
 <?php get_footer(); ?>
+

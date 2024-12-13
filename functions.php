@@ -157,13 +157,7 @@ add_action('acf/save_post', function($post_id) {
 }, 20);
 
 // S'assurer que chaque utilisateur ne peut avoir qu'un portrait
-function restrict_user_to_one_portrait($query) {
-    if (!is_admin() && is_user_logged_in() && $query->is_main_query() && $query->get('post_type') === 'portrait') {
-        $query->set('meta_key', 'attributed_user');
-        $query->set('meta_value', get_current_user_id());
-    }
-}
-add_action('pre_get_posts', 'restrict_user_to_one_portrait');
+
 
 function set_attributed_user( $post_id ) {
     // Vérifiez que nous sommes dans le bon post_type
@@ -218,30 +212,6 @@ function set_portrait_title( $post_id ) {
     }
 }
 add_action('acf/save_post', 'set_portrait_title', 20); // Priorité 20 pour s'assurer que les champs sont sauvegardés avant
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

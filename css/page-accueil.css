@@ -204,6 +204,7 @@ body {
 /* Style de chaque article */
 .actualite-item {
     background-color: #fdfdfd;
+    position: relative;
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -424,3 +425,5 @@ body {
         border-color: #002C40; /* Changement de couleur lors du focus */
         outline: none;
     }
+
+    

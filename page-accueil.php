@@ -152,10 +152,22 @@ get_header();
                         <?php endif; ?>
                     </div>
 
+                    
                     <div class="actualite-details">
-                        <!-- Afficher l'auteur et la date -->
-                        <span class="actualite-author">Écrit par <?php the_author(); ?></span>
-                    </div>
+                     
+                            <?php
+                            // Utiliser get_the_terms pour récupérer les tags
+                            $tags = get_the_terms(get_the_ID(), 'post_tag');
+                            if ($tags && !is_wp_error($tags)) :
+                                echo '<div class="actualite-tags">';
+                                foreach ($tags as $tag) {
+                                    // Utiliser un span au lieu d'un lien
+                                    echo '<span class="tag-button">' . esc_html($tag->name) . '</span> ';
+                                }
+                                echo '</div>';
+                            endif;
+                            ?>
+                        </div>
                 </a>
             </article>
         <?php endwhile;
@@ -229,20 +241,21 @@ wp_reset_postdata();
 
 <div id="map-wrapper">
     <div id="map">
-    <div class="filter-container">
-        <select id="city-filter">
-            <option value="">Sélectionnez une ville</option>
-            <!-- Options seront ajoutées dynamiquement -->
-        </select>
-    
-        <select id="promotion-filter">
-            <option value="">Sélectionnez une promotion</option>
-            <!-- Options seront ajoutées dynamiquement -->
-        </select>
+        <div class="filter-container">
+            <select id="city-filter">
+                <option value="">Sélectionnez une ville</option>
+            </select>
+        
+            <select id="promotion-filter">
+                <option value="">Sélectionnez une promotion</option>
+            </select>
+
+            <!-- Champ de recherche par nom/prénom -->
+            <input type="text" id="name-filter" placeholder="Rechercher par nom / prénom">
         </div>
     </div>
     <div id="overlay">
-        <h3>MMi présents à</h3>
+        <h3>MMI présents à</h3>
         <div id="company-list"></div>
     </div>
 </div>
@@ -250,7 +263,11 @@ wp_reset_postdata();
 
 
 
+<div class="containerArticle">
 
+<h1 class="page-titleAccueil">Avis sur la formation</h1>
+
+</div>
 
 
 <?php get_footer(); ?>
@@ -266,40 +283,31 @@ document.addEventListener('DOMContentLoaded', function () {
         attribution: '&copy; <a href="https://carto.com/">CartoDB</a>'
     }).addTo(map);
 
-    // Liste des entreprises avec leurs coordonnées
     const locations = <?php echo json_encode($locations); ?>;
 
-    // Créer une couche de groupe pour les marqueurs
     const markerGroup = L.featureGroup().addTo(map);
 
-    // Créer un objet pour organiser les entreprises par ville et promotion
     const cities = {};
     const promotions = {};
 
     locations.forEach(location => {
         if (location.lat && location.lng) {
             const city = location.ville_entreprise;
-            const promo = location.promotions ? location.promotions.join(', ') : ''; // Promotion(s) des entreprises
+            const promo = location.promotions ? location.promotions.join(', ') : '';
 
-            // Ajouter la ville
-            if (!cities[city]) {
-                cities[city] = [];
-            }
+            if (!cities[city]) cities[city] = [];
             cities[city].push(location);
 
-            // Ajouter la promotion
             if (promo) {
-                if (!promotions[promo]) {
-                    promotions[promo] = [];
-                }
+                if (!promotions[promo]) promotions[promo] = [];
                 promotions[promo].push(location);
             }
         }
     });
 
-    // Remplir les filtres par ville et promotion
     const cityFilter = document.getElementById('city-filter');
     const promoFilter = document.getElementById('promotion-filter');
+    const nameFilter = document.getElementById('name-filter'); // Champ de recherche pour nom/prénom
 
     Object.keys(cities).forEach(city => {
         const option = document.createElement('option');
@@ -315,43 +323,55 @@ document.addEventListener('DOMContentLoaded', function () {
         promoFilter.appendChild(option);
     });
 
-    // Fonction pour mettre à jour la carte avec les filtres
     function updateMap() {
         const selectedCity = cityFilter.value;
         const selectedPromo = promoFilter.value;
+        const nameQuery = nameFilter.value.toLowerCase();
 
-        // Supprimer tous les marqueurs existants
         markerGroup.clearLayers();
 
-        // Filtrer les locations en fonction des filtres sélectionnés
         const filteredLocations = locations.filter(location => {
             const matchesCity = selectedCity ? location.ville_entreprise === selectedCity : true;
             const matchesPromo = selectedPromo ? location.promotions.includes(selectedPromo) : true;
-            return matchesCity && matchesPromo;
+
+            // Recherche avancée par prénom ou nom
+            const fullName = location.nom_portrait ? location.nom_portrait.split(' ') : [];
+            const firstName = fullName[0]?.toLowerCase() || ''; // Prénom
+            const lastName = fullName[1]?.toLowerCase() || ''; // Nom
+
+            const matchesName = nameQuery
+                ? firstName.startsWith(nameQuery) || lastName.startsWith(nameQuery)
+                : true;
+
+            return matchesCity && matchesPromo && matchesName;
         });
 
-        // Ajouter les marqueurs filtrés sur la carte
         filteredLocations.forEach(location => {
             const marker = L.marker([location.lat, location.lng]).addTo(markerGroup);
 
-            // Lier un événement au marqueur pour afficher l'overlay
             marker.on('click', function () {
-                const city = location.ville_entreprise; // Récupérer la ville du marqueur cliqué
-                const selectedPromo = promoFilter.value; // Récupérer la promotion sélectionnée
-                const cityLocations = cities[city]; // Filtrer les entreprises de cette ville
+                const city = location.ville_entreprise;
+                const nameQuery = nameFilter.value.toLowerCase(); // Rechercher uniquement les résultats liés à la recherche
 
-                // Filtrer les profils de la ville par la promotion sélectionnée
-                const filteredCityLocations = cityLocations.filter(loc => {
-                    if (selectedPromo) {
-                        return loc.promotions && loc.promotions.includes(selectedPromo);
-                    }
-                    return true;
+                // Filtrer uniquement les résultats de la recherche dans cette ville
+                const filteredCityLocations = cities[city].filter(loc => {
+                    const fullName = loc.nom_portrait.split(' ');
+                    const firstName = fullName[0]?.toLowerCase() || '';
+                    const lastName = fullName[1]?.toLowerCase() || '';
+
+                    return (
+                        (!nameQuery || firstName.startsWith(nameQuery) || lastName.startsWith(nameQuery))
+                    );
                 });
 
                 filteredCityLocations.sort((a, b) => a.nom_portrait.localeCompare(b.nom_portrait));
 
-                // Mettre à jour l'overlay
-                document.querySelector('#overlay h3').textContent = `MMI présents à ${city}`;
+                // Mise à jour de l'overlay
+                const overlayTitle = nameQuery
+                    ? `Résultat de la recherche pour "${nameQuery}" à ${city}`
+                    : `MMI présents à ${city}`;
+                document.querySelector('#overlay h3').textContent = overlayTitle;
+
                 const companyListDiv = document.getElementById('company-list');
                 companyListDiv.innerHTML = '';
 
@@ -359,11 +379,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const imgTag = loc.photo_profil
                         ? `<img src="${loc.photo_profil}" alt="Photo de ${loc.nom_portrait}" class="profile-photo">`
                         : '';
-
                     const metiers = loc.metiers.length
                         ? `<p class="card-metier">${loc.metiers.join(', ')}</p>`
                         : '';
-
                     const promotions = loc.promotions.length
                         ? `<p class="card-promotion">Promotion : ${loc.promotions.join(', ')}</p>`
                         : '';
@@ -391,20 +409,20 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        // Ajuster la vue de la carte pour englober tous les marqueurs
         if (filteredLocations.length > 0) {
             const bounds = markerGroup.getBounds();
-            map.fitBounds(bounds, { padding: [20, 20] }); // Zoom pour afficher tous les marqueurs
+            map.fitBounds(bounds, { padding: [20, 20] });
         }
     }
 
-    // Initialiser la carte avec tous les marqueurs
     updateMap();
 
-    // Fermer l'overlay lors du changement de filtre
     cityFilter.addEventListener('change', updateMap);
     promoFilter.addEventListener('change', updateMap);
+    nameFilter.addEventListener('input', updateMap);
 });
+
+
 
 </script>
 
@@ -527,7 +545,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* Style des champs de sélection */
-    .filter-container select {
+    .filter-container select, input {
         padding: 8px;
         font-size: 14px;
         border: 1px solid #ccc;
@@ -540,6 +558,32 @@ document.addEventListener('DOMContentLoaded', function () {
         border-color: #002C40; /* Changement de couleur lors du focus */
         outline: none;
     }
+
+
+    .actualite-tags {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 210px;
+}
+
+.tag-button {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #F4BB46; /* Bleu */
+    color: black;
+    border-radius: 15px;
+    position: relative;
+    font-size: 0.9em;
+    margin-right: 5px;
+    cursor: default; /* Désactive le curseur de lien */
+}
+
+.tag-button:hover {
+    background-color: #002C40;
+    color: #fff;
+}
 
 </style>
 

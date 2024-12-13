@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <div class="container register-page">
     <!-- Section Image -->
     <div class="image-section">
-        <img src="<?php echo get_template_directory_uri(); ?>/images/ImageLogin.png" alt="Image d'inscription">
+        <img src="<?php echo get_template_directory_uri(); ?>/images/TemplateRemmind.png" alt="Image d'inscription">
     </div>
 
     <!-- Section Formulaire -->

@@ -27,6 +27,7 @@ body {
 
 .actualite-item {
     background-color: #fdfdfd;
+    position: relative;
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -91,4 +92,23 @@ body {
     padding: 5px 20px 0px 20px;
     font-size: 0.9em;
     color: #646262;
+}
+
+.actualite-tags {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 210px;
+}
+
+.tag-button {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #F4BB46; /* Bleu */
+    color: black;
+    border-radius: 15px;
+    font-size: 0.9em;
+    margin-right: 5px;
+    cursor: default; /* Désactive le curseur de lien */
 }
