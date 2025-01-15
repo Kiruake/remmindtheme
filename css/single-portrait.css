@@ -125,16 +125,17 @@ body {
     }
     
     .competence-item {
-        background-color: #F4BB46; /* Fond jaune */
-        color: #000; /* Texte noir */
+        background-color: #F4BB46;
+        color: #000;
         padding: 5px 5px;
-        border-radius: 6px; /* Bords arrondis */
+        border-radius: 6px;
         text-align: center;
         width: 20%;
         box-sizing: border-box;
-        white-space: nowrap; /* Empêche le texte de se déborder */
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        min-width: fit-content;
     }
 
 
@@ -163,7 +164,33 @@ body {
         .competence-item {
             flex: 1 1 calc(50% - 10px); /* 2 compétences par ligne */
         }
+
+        .portrait-left {
+            flex: 0 0 100%;
+            max-width: 100%;
+            position: relative;
+        }
+
+        .portrait-left img {
+            width: 100vw;
+            height: 500px;
+            display: block;
+            object-fit: cover;
+        }
+        
+        .portrait-right {
+            width: 90%;
+            margin: auto;
+        }
+
+        .none-temoignage {
+            margin-bottom: 60px;
     }
+
+    .portrait-right p {
+        width: 100%;
+    }
+}
     
     @media (max-width: 480px) {
         .competence-item {

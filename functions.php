@@ -48,6 +48,25 @@ function enqueue_archive_actualite_styles() {
 }
 add_action('wp_enqueue_scripts', 'enqueue_archive_actualite_styles');
 
+function enqueue_homepage_styles() {
+    if (is_front_page()) {
+        wp_enqueue_style('homepage-style', get_template_directory_uri() . '/css/page-accueil.css', array(), null);
+    }
+}
+
+add_action('wp_enqueue_scripts', 'enqueue_homepage_styles');
+
+
+function theme_enqueue_styles() {
+    wp_enqueue_style( 'theme-style', get_stylesheet_uri() );
+    
+    // Ajoutez un fichier CSS personnalisé si nécessaire
+    wp_enqueue_style('custom-fonts', get_template_directory_uri() . '/css/font.css', array(), null);
+
+}
+
+add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles' );
+
 
 function custom_search_and_filter_results( $query ) {
     if ( !is_admin() && $query->is_main_query() ) {
@@ -213,5 +232,147 @@ function set_portrait_title( $post_id ) {
 }
 add_action('acf/save_post', 'set_portrait_title', 20); // Priorité 20 pour s'assurer que les champs sont sauvegardés avant
 
+
+
+// Dans votre functions.php, ajoutez ces lignes pour inclure Slick Carousel
+function ajouter_slick_carousel() {
+    // Ajouter le CSS de Slick
+    wp_enqueue_style('slick-carousel', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css');
+    wp_enqueue_style('slick-theme', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css');
+    
+    // Ajouter le JS de Slick
+    wp_enqueue_script('slick-carousel', 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js', array('jquery'), null, true);
+}
+add_action('wp_enqueue_scripts', 'ajouter_slick_carousel');
+
+// Ajouter des champs dans le formulaire d'ajout de la taxonomie
+// Ajouter des champs personnalisés à la création de la taxonomie
+function edit_metier_custom_fields($term) {
+    // Récupérer les valeurs existantes
+    $niveau = get_term_meta($term->term_id, 'niveau', true);
+    $lien_rome = get_term_meta($term->term_id, 'lien_rome', true);
+    $image_url = get_term_meta($term->term_id, 'metier_image', true);
+    $titre1 = get_term_meta($term->term_id, 'titre1', true);
+    $paragraphe1 = get_term_meta($term->term_id, 'paragraphe1', true);
+    $titre2 = get_term_meta($term->term_id, 'titre2', true);
+    $paragraphe2 = get_term_meta($term->term_id, 'paragraphe2', true);
+    ?>
+
+    <tr class="form-field">
+        <th scope="row" valign="top"><label for="titre1">Niveau</label></th>
+        <td>
+            <input type="number" name="niveau" id="niveau" value="<?php echo esc_attr($niveau); ?>">
+            <p class="description">Entrez le niveau de BAC.</p>
+        </td>
+    </tr>
+
+    <tr class="form-field">
+        <th scope="row" valign="top"><label for="lien_rome">Lien fiche ROME</label></th>
+        <td>
+            <input type="text" name="lien_rome" id="lien_rome" value="<?php echo esc_url($lien_rome); ?>">
+            <p class="description">Entrez le lien vers la fiche ROME.</p>
+        </td>
+    </tr>
+
+    <tr class="form-field">
+        <th scope="row" valign="top"><label for="metier_image">Image</label></th>
+        <td>
+            <input type="text" name="metier_image" id="metier_image" value="<?php echo esc_url($image_url); ?>" class="image-url">
+            <button type="button" class="upload-image-button button">Uploader une image</button>
+            <p class="description">Ajoutez une image représentative pour cette taxonomie.</p>
+        </td>
+    </tr>
+
+    <tr class="form-field">
+        <th scope="row" valign="top"><label for="titre1">Titre 1</label></th>
+        <td>
+            <input type="text" name="titre1" id="titre1" value="<?php echo esc_attr($titre1); ?>">
+            <p class="description">Entrez le premier titre pour cette taxonomie.</p>
+        </td>
+    </tr>
+    <tr class="form-field">
+        <th scope="row" valign="top"><label for="paragraphe1">Paragraphe 1</label></th>
+        <td>
+            <textarea name="paragraphe1" id="paragraphe1" rows="5"><?php echo esc_textarea($paragraphe1); ?></textarea>
+            <p class="description">Entrez le premier paragraphe pour cette taxonomie.</p>
+        </td>
+    </tr>
+    <tr class="form-field">
+        <th scope="row" valign="top"><label for="titre2">Titre 2</label></th>
+        <td>
+            <input type="text" name="titre2" id="titre2" value="<?php echo esc_attr($titre2); ?>">
+            <p class="description">Entrez le second titre pour cette taxonomie.</p>
+        </td>
+    </tr>
+    <tr class="form-field">
+        <th scope="row" valign="top"><label for="paragraphe2">Paragraphe 2</label></th>
+        <td>
+            <textarea name="paragraphe2" id="paragraphe2" rows="5"><?php echo esc_textarea($paragraphe2); ?></textarea>
+            <p class="description">Entrez le second paragraphe pour cette taxonomie.</p>
+        </td>
+    </tr>
+    <?php
+}
+add_action('metier_edit_form_fields', 'edit_metier_custom_fields');
+
+
+function save_metier_custom_fields($term_id) {
+
+    if (isset($_POST['niveau'])) {
+        update_term_meta($term_id, 'niveau', sanitize_text_field($_POST['niveau']));
+    }
+
+    if (isset($_POST['lien_rome'])) {
+        update_term_meta($term_id, 'lien_rome', sanitize_text_field($_POST['lien_rome']));
+    }
+
+    if (isset($_POST['metier_image'])) {
+        update_term_meta($term_id, 'metier_image', intval($_POST['metier_image']));
+    }
+    
+    if (isset($_POST['titre1'])) {
+        update_term_meta($term_id, 'titre1', sanitize_text_field($_POST['titre1']));
+    }
+    if (isset($_POST['paragraphe1'])) {
+        update_term_meta($term_id, 'paragraphe1', sanitize_textarea_field($_POST['paragraphe1']));
+    }
+    if (isset($_POST['titre2'])) {
+        update_term_meta($term_id, 'titre2', sanitize_text_field($_POST['titre2']));
+    }
+    if (isset($_POST['paragraphe2'])) {
+        update_term_meta($term_id, 'paragraphe2', sanitize_textarea_field($_POST['paragraphe2']));
+    }
+}
+add_action('created_metier', 'save_metier_custom_fields');
+add_action('edited_metier', 'save_metier_custom_fields');
+
+function enqueue_media_uploader_script($hook) {
+    if (in_array($hook, ['edit-tags.php', 'term.php'])) {
+        wp_enqueue_media();
+        wp_enqueue_script('custom-taxonomy-media-uploader', get_template_directory_uri() . '/js/taxonomy-media-uploader.js', ['jquery'], null, true);
+    }
+}
+add_action('admin_enqueue_scripts', 'enqueue_media_uploader_script');
+
+
+add_action('user_register', 'set_user_pending_status');
+function set_user_pending_status($user_id) {
+    update_user_meta($user_id, 'account_status', 'pending');
+}
+
+add_filter('authenticate', 'block_unapproved_users', 30, 3);
+function block_unapproved_users($user, $username, $password) {
+    if (!is_wp_error($user)) {
+        $account_status = get_user_meta($user->ID, 'account_status', true);
+        if ($account_status === 'pending') {
+            return new WP_Error('pending_approval', __('Votre compte est en attente de validation.'));
+        }
+    }
+    return $user;
+}
+
+function approve_user($user_id) {
+    update_user_meta($user_id, 'account_status', 'approved');
+}
 
 

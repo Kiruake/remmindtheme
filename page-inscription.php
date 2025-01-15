@@ -176,4 +176,22 @@ body {
     font-size: 0.9rem;
 }
 
+@media screen and (max-width: 1024px) {
+  .container.register-page {
+      display: block;
+  }
+
+  .register-page .image-section {
+      height: 30%
+  }
+
+
+}
+
+@media screen and (max-width: 600px) {
+
+    .register-page h1 {
+      font-size: 2rem;
+  }
+}
 </style>

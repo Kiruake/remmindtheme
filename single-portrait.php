@@ -17,6 +17,7 @@ get_header();
         $prenom = get_field('prenom');
         $nom = get_field('nom');
         $age = get_field('age');
+        $ville_entreprise = get_field('ville_entreprise');
         $lien_linkedin = get_field('lien_linkedin');
         $lien_portfolio= get_field('lien_portfolio');
         $presentation = get_field('presentation');
@@ -27,6 +28,12 @@ get_header();
         $reponse2 = get_field('reponse2');
         $question3 = get_field('question3');
         $reponse3 = get_field('reponse3');
+        $question4 = get_field('question4');
+        $reponse4 = get_field('reponse4');
+        $question5 = get_field('question5');
+        $reponse5 = get_field('reponse5');
+        $question6 = get_field('question6');
+        $reponse6 = get_field('reponse6');
         $competences = get_the_terms(get_the_ID(), 'competence');
         $metiers = get_the_terms(get_the_ID(), 'metier');
         $promotions = get_the_terms(get_the_ID(), 'promotion');
@@ -49,7 +56,7 @@ get_header();
         ?>
             <img src="<?php echo esc_url($photo_url); ?>" alt="<?php echo esc_attr($photo_alt); ?>">
         <?php else : ?>
-            <p>Aucune photo disponible.</p>
+            <img src="<?php echo esc_url(get_template_directory_uri() . '/images/DefaultProfil.png'); ?>" alt="Default Profile Picture">
         <?php endif; ?>
     </div>
 
@@ -62,32 +69,54 @@ get_header();
             </h3>
         <?php endif; ?>
 
-        <?php if ($prenom || $nom || $age) : ?>
-            <h2 class="titre-nom"><?php echo esc_html($prenom) . ' ' . esc_html($nom) . ', ' . esc_html($age); ?> ans</h2>
+        <?php 
+        $age_default = $age ? esc_html($age) . ' ans' : 'Âge non renseigné';
+        if ($prenom || $nom || $age) : ?>
+            <h2 class="titre-nom"><?php echo esc_html($prenom) . ' ' . esc_html($nom) . ', ' . $age_default; ?></h2>
         <?php endif; ?>
 
         <div class="metiers">
 
-            <div>
-                <?php if ($metiers && !is_wp_error($metiers) || $nom_entreprise) : ?>
-            
-                <?php foreach ($metiers as $metier) : ?>
-                    <h2><?php echo esc_html($metier->name) . ' - ' . esc_html($nom_entreprise); ?></h2>
-                <?php endforeach; ?>
-            
-                <?php endif; ?>
-            </div>
+    <?php 
+    $parts = [];
 
-            <div class="LinkedinPortfolio">
-                <?php if ($lien_linkedin) : ?>
-                    <a href="<?php echo esc_url($lien_linkedin); ?>" target="_blank" rel="noopener"><img class="linkedin-icon" src="<?php echo get_template_directory_uri(); ?>/images/LinkedinIcon.png" alt="Lien vers LinkedIn"></a>
-                <?php endif; ?>
-                <?php if ($lien_portfolio) : ?>
-                    <a href="<?php echo esc_url($lien_portfolio); ?>" target="_blank" rel="noopener"><img class="portfolio-icon" src="<?php echo get_template_directory_uri(); ?>/images/Portfolio.png" alt="Lien vers Portfolio"></a>
-                <?php endif; ?>
-            </div>
+    // Ajouter la ville
+    if ($ville_entreprise) {
+        $parts[] = esc_html($ville_entreprise);
+    }
 
-        </div>
+    // Ajouter le nom de l'entreprise
+    if ($nom_entreprise) {
+        $parts[] = esc_html($nom_entreprise);
+    }
+
+    // Ajouter les noms des métiers
+    if ($metiers && !is_wp_error($metiers)) {
+        foreach ($metiers as $metier) {
+            $parts[] = esc_html($metier->name);
+        }
+    }
+
+    // Afficher la chaîne combinée avec des tirets si des données existent
+    if (!empty($parts)) : ?>
+        <h2><?php echo implode(' - ', $parts); ?></h2>
+    <?php endif; ?>
+
+    <div class="LinkedinPortfolio">
+        <?php if ($lien_linkedin) : ?>
+            <a href="<?php echo esc_url($lien_linkedin); ?>" target="_blank" rel="noopener">
+                <img class="linkedin-icon" src="<?php echo get_template_directory_uri(); ?>/images/LinkedinIcon.png" alt="Lien vers LinkedIn">
+            </a>
+        <?php endif; ?>
+        <?php if ($lien_portfolio) : ?>
+            <a href="<?php echo esc_url($lien_portfolio); ?>" target="_blank" rel="noopener">
+                <img class="portfolio-icon" src="<?php echo get_template_directory_uri(); ?>/images/Portfolio.png" alt="Lien vers Portfolio">
+            </a>
+        <?php endif; ?>
+    </div>
+
+</div>
+
 
         <?php if ($presentation) : ?>
             <p><?php echo esc_html($presentation); ?></p>
@@ -125,7 +154,22 @@ get_header();
                 <p><?php echo esc_html($reponse3); ?></p>
             <?php endif; ?>
 
-            <?php if (!$question1 && !$question2 && !$question3) : ?>
+            <?php if ($question4 && $reponse4) : ?>
+                <h4 class="questions"><?php echo esc_html($question4); ?></h4>
+                <p><?php echo esc_html($reponse4); ?></p>
+            <?php endif; ?>
+
+            <?php if ($question5 && $reponse5) : ?>
+                <h4 class="questions"><?php echo esc_html($question5); ?></h4>
+                <p><?php echo esc_html($reponse5); ?></p>
+            <?php endif; ?>
+
+            <?php if ($question6 && $reponse6) : ?>
+                <h4 class="questions"><?php echo esc_html($question6); ?></h4>
+                <p><?php echo esc_html($reponse6); ?></p>
+            <?php endif; ?>
+
+            <?php if (!$question1 && !$question2 && !$question3 && !$question4 && !$question5 && !$question6) : ?>
         <p class="none-temoignage"><?php echo $prenom ?> n'a pas de témoignage disponible.</p>
     <?php endif; ?>
         </div>

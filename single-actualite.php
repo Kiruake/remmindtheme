@@ -26,7 +26,7 @@ $archive_actualite_url = get_post_type_archive_link('actualite'); // Modifier av
 // Construire le titre dynamique
 $title_dynamic = '<a href="' . esc_url($archive_actualite_url) . '" class="archive-link">articles</a>'; // Lien vers la page d'archive
 if ($tag_name) {
-    $title_dynamic .= ' · <a href="' . esc_url($tag_link) . '" class="tag-link">' . esc_html($tag_name) . '</a>'; // Ajouter le lien de l'étiquette si disponible
+    $title_dynamic .= ' · ' . esc_html($tag_name); // Ajouter le nom de l'étiquette si disponible
 }
 
 // Afficher le titre

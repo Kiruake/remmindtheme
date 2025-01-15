@@ -5,7 +5,7 @@
 
 <div class="bannierePortraits">
     <img src="<?php echo get_template_directory_uri(); ?>/images/BannierePortraits.png" alt="Bannière Alumnis">
-    <h1 class="texteAlumnis">Le réseau Alumnis<br> de MMI Montbéliard</h1>
+    <h1 class="texteAlumnis">La crème de la crème :<br>Ceux qui font notre fierté</h1>
 </div>
 
 <div class="container">
@@ -61,10 +61,13 @@
     $metier_filter = isset($_GET['metier']) ? sanitize_text_field($_GET['metier']) : '';
     $promotion_filter = isset($_GET['promotion']) ? sanitize_text_field($_GET['promotion']) : '';
 
+    $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+
     // Préparer la requête WP_Query avec les filtres et la recherche
     $args = array(
         'post_type' => 'portrait',
         'posts_per_page' => 12,
+        'paged' => $paged,
         's' => $search_query,
         'tax_query' => array(
             'relation' => 'AND',
@@ -103,6 +106,10 @@
                             <div class="portrait-photo">
                                 <img src="<?php echo esc_url($photo_profil['url']); ?>" alt="<?php echo esc_attr($photo_profil['alt']); ?>" />
                             </div>
+                        <?php else : ?>
+                            <div class="portrait-photo">
+                                <img src="<?php echo get_template_directory_uri() . '/images/DefaultProfil.png'; ?>" alt="Default Profile Picture">
+                            </div>
                         <?php endif; ?>
 
                         <div class="portrait-info">
@@ -118,7 +125,7 @@
                         </div>
 
                         <div class="portrait-details">
-                            <span class="portrait-age"><?php echo esc_html(get_field('age')); ?> ans</span>
+                            <span class="portrait-age"><?php echo (get_field('age') ? esc_html(get_field('age')) . ' ans' : 'Âge non renseigné'); ?></span>
                             <?php
                             $promotions = get_the_terms(get_the_ID(), 'promotion');
                             if ($promotions && !is_wp_error($promotions)) :
@@ -132,20 +139,33 @@
         </div>
 
         <!-- Pagination -->
-        <div class="pagination">
-            <?php
-            the_posts_pagination(array(
-                'mid_size' => 2,
-                'prev_text' => __('« Précédent', 'textdomain'),
-                'next_text' => __('Suivant »', 'textdomain'),
-            ));
-            ?>
-        </div>
+     <!-- Pagination -->
+    <div class="pagination">
+        <?php
+        echo paginate_links(array(
+            'total' => $portrait_query->max_num_pages,
+            'current' => $paged,
+            'mid_size' => 2,
+            'prev_text' => __('Précédent', 'textdomain'),
+            'next_text' => __('Suivant', 'textdomain'),
+        ));
+        ?>
+    </div>
     <?php else : ?>
         <p>Aucun portrait trouvé.</p>
     <?php endif; ?>
 
+    <?php
+// Réinitialiser la requête pour ne pas interférer avec la boucle principale
+    wp_reset_postdata();
+    ?>
+
 </div>
+
+<?php
+// Réinitialiser la requête pour ne pas interférer avec la boucle principale
+wp_reset_postdata();
+?>
 
 <?php get_footer(); ?>
 

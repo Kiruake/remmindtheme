@@ -191,4 +191,64 @@ body {
 }
 
 
+@media screen and (min-width: 601px) and (max-width: 1024px) {
+
+    .container.connexion-page {
+    display: block;
+    height: 100vh;
+}
+    .connexion-page, .form-section {
+    flex-direction: column;
+    
+}
+
+.form-section {
+    padding: 3rem;
+}
+
+.connexion-page .image-section {
+    flex-basis: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    height: 30%;
+}
+
+
+}
+
+@media screen and (max-width: 600px) {
+
+    .connexion-page .image-section {
+    flex-basis: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    height: 30%;
+}
+
+.container.connexion-page {
+    display: block;
+    height: 100vh;
+}
+    .connexion-page, .form-section {
+    flex-direction: column;
+    
+}
+
+    .connexion-page h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.form-section {
+    padding: 5rem;
+}
+
+.no-account {
+    margin-bottom: 100px;
+}
+}
 </style>

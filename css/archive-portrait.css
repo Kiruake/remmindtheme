@@ -16,7 +16,6 @@ body {
 
 /* Titre de la page */
 .page-title {
-    
     font-size: 2em;
     text-transform: uppercase;
     margin-bottom: 40px;
@@ -26,8 +25,8 @@ body {
 /* Grille des portraits */
 .portrait-archive-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
     justify-content: center;
 }
 
@@ -38,7 +37,7 @@ body {
     display: flex;
     flex-direction: column;
     transition: transform 0.2s, box-shadow 0.2s;
-    width: 300px;
+    width: 100%;
     height: 410;
 }
 
@@ -49,7 +48,7 @@ body {
 
 /* Photo du portrait */
 .portrait-photo img {
-    width: 260px;
+    width: 90%;
     height: 260px;
     object-fit: cover;
     display: flex;
@@ -188,6 +187,50 @@ body {
 }
 
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    padding: 10px 0;
+}
+
+.pagination a, .pagination span {
+    display: inline-block;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #555;
+    font-size: 16px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.pagination .current {
+    background-color: #002C40;
+    color: #fff;
+    border-color: #002C40;
+    pointer-events: none;
+    font-weight: bold;
+}
+
+.pagination .prev, .pagination .next {
+    font-weight: bold;
+}
+
+.pagination .prev:hover, .pagination .next:hover {
+    background-color: #002C40;
+    color: #fff;
+}
+
+
 .btnSubmit {
     padding: 10px;
     border: 1px solid #ddd;
@@ -198,4 +241,78 @@ body {
     transition: border-color 0.3s;
     font-family: 'Montserrat', sans-serif;
     margin-top: 20px;
+}
+
+
+/* Tablette (max-width: 1024px) */
+@media screen and (max-width: 1024px) {
+    /* Grille des portraits */
+    .portrait-archive-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 3rem;
+        justify-content: center;
+    }
+
+    .portrait-item {
+        width: 100%; 
+        max-width: 400px; 
+        margin: 0 auto; 
+        height: auto;
+        max-height: 450px;
+        min-height: 400px;
+    }
+
+    .portrait-details {
+        margin-bottom: 1rem;
+
+}
+
+    .filter-form {
+        gap: 40px;
+        justify-content: center;
+    }
+
+    .page-title {
+        text-align: center;
+    }
+
+}
+
+@media screen and (max-width: 720px) {
+ 
+    .portrait-archive-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .filter-group select, input {
+        width: 80%;
+    }
+
+    .filter-form {
+   
+        gap: 40px;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+        align-items: normal;
+        margin-bottom: 40px;
+    
+    }
+
+    .filter-buttons button {
+        margin: auto;
+    }
+
+    .filter-group {
+        align-items: center;
+    }
+}
+
+@media screen and (max-width: 600px) {
+
+    .texteAlumnis {
+        font-size: 1.8rem;
+    }
+    
 }

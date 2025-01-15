@@ -1,3 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remmind</title>
+</head>
+<body>
+    
+</body>
+</html>
+
 <link rel="stylesheet" href="<?php echo get_template_directory_uri(); ?>/css/page-accueil.css">
 
 <?php
@@ -8,9 +20,22 @@ Template Name: Accueil
 get_header();
 ?>
 
-<div>
-    <img class="image-section" src="<?php echo get_template_directory_uri(); ?>/images/ImageAccueil.png" alt="Image de l'accueil">
+<div class="image-container">
+    <img class="image-section" src="<?php echo get_template_directory_uri(); ?>/images/BanniereAccueil.png" alt="Image de l'accueil">
+
+    <!-- Text overlay on the left -->
+    <div class="text-overlay">
+        <h2>Parce qu’on ne quitte<br>
+        jamais vraiment la team !</h2>
+    </div>
+
+    <!-- Logo overlay on the right -->
+    <div class="logo-overlay">
+        <img class="logo-section" src="<?php echo get_template_directory_uri(); ?>/images/logo_remmind_blanc.png" alt="Logo">
+    </div>
 </div>
+
+
 
 <!-- Bande jaune pour les membres -->
 <div class="yellow-band">
@@ -21,39 +46,32 @@ get_header();
     </a>
 </div>
 
-<h1 class="page-titleAccueil">au BUT Métiers du Multimédia et de l'Internet</h1>
-
-<p class="paragrapheAccueil">Le Bachelor Universitaire de Technologie (BUT) en Métiers du Multimédia et de l'Internet (MMI) de Montbéliard affiche un fort taux d’insertion professionnelle dans les domaines du numérique, de la communication et du design interactif. La majorité des diplômés trouvent un emploi grâce au solide réseau d’anciens étudiants, qui jouent un rôle clé dans la recommandation et l’accompagnement des jeunes diplômés, notamment via des stages. Les spécialisations en UX design, développement web et motion design sont particulièrement recherchées.</p>
-
-<div class="sectionStat">
-
-<div class="cardStat">
-<h2 class="chiffreStat">80%</h2>
-<p>trouvent un emploi dans les six mois<br> suivant l'obtention de leur diplôme</p>
-</div>
-
-<div class="cardStat2">
-<h2 class="chiffreStat">40 à 50 %</h2>
-<p>poursuives leurs études en<br> master après MMI</p>
-</div>
-
-<div class="cardStat">
-<h2 class="chiffreStat">40%</h2>
-<p>choisissent également de suivre leur<br> cursus en alternance</p>
-</div>
-
-</div>
+<section class="first-section">
+    <div class="first-section-container">
+        <div class="first-section-text">
+            <h2 class="first-section-title">Plus qu’un diplôme, une famille !</h2>
+            <p class="first-section-paragraph">
+            Parce qu’être MMI, ce n’est pas juste un diplôme, c’est une aventure qui continue bien après la remise des chapeaux.<br><br>
+            La communauté MMI Montbéliard, c’est un espace où anciens, étudiants et enseignants partagent, inspirent et créent ensemble.<br><br>
+            Rejoignez-nous pour vivre l’esprit MMI : mentorat, événements, collaborations… et bien sûr, des souvenirs inoubliables !
+            </p>
+        </div>
+        <div class="first-section-images">
+            <img src="<?php echo get_template_directory_uri(); ?>/images/SectionAccueil.png" alt="Image à droite" class="first-section-right-image">
+        </div>
+    </div>
+</section>
 
 <div class="container">
 
-<h1 class="page-titleAccueil">Les portraits des Alumni</h1>
+<h1 class="page-titleAccueil">Nos héros du numérique : Portraits des anciens</h1>
 
 <div class="portrait-archive-grid">
     <?php
     // Requête pour récupérer 3 portraits aléatoires
     $args = array(
         'post_type' => 'portrait', // Remplacez 'portrait' par le slug de votre type de contenu personnalisé
-        'posts_per_page' => 4,
+        'posts_per_page' => 3,
         'orderby' => 'rand', // Aléatoire
         'meta_query' => [
         ['key' => '_latitude', 'compare' => 'EXISTS'],
@@ -73,6 +91,10 @@ get_header();
                         <div class="portrait-photo">
                             <img src="<?php echo esc_url($photo_profil['url']); ?>" alt="<?php echo esc_attr($photo_profil['alt']); ?>" />
                         </div>
+                    <?php else : ?>
+                        <div class="portrait-photo">
+                            <img src="<?php echo esc_url(get_template_directory_uri() . '/images/DefaultProfil.png'); ?>" alt="Default Profile Picture" />
+                        </div>
                     <?php endif; ?>
 
                     <div class="portrait-info">
@@ -88,7 +110,7 @@ get_header();
                     </div>
 
                     <div class="portrait-details">
-                        <span class="portrait-age"><?php echo esc_html(get_field('age')); ?> ans</span>
+                        <span class="portrait-age"><?php echo (get_field('age') ? esc_html(get_field('age')) . ' ans' : 'Âge non renseigné'); ?></span>
                         <?php
                         $promotions = get_the_terms(get_the_ID(), 'promotion');
                         if ($promotions && !is_wp_error($promotions)) :
@@ -113,77 +135,6 @@ get_header();
 
 </div>
 
-<div class="containerArticle">
-
-<h1 class="page-titleArticle">Les derniers articles</h1>
-
-<div class="actualite-archive-grid">
-    <?php
-    // Requête pour récupérer 3 articles récents (ou aléatoires, selon vos besoins)
-    $args = array(
-        'post_type' => 'actualite', // Type de contenu : article
-        'posts_per_page' => 3, // Nombre d'articles à afficher
-        'orderby' => 'date', // Trier par date (ou 'rand' pour aléatoire)
-        'order' => 'DESC', // Du plus récent au plus ancien
-    );
-
-    $actualite_query = new WP_Query($args);
-
-    if ($actualite_query->have_posts()) :
-        while ($actualite_query->have_posts()) : $actualite_query->the_post(); ?>
-            <article id="post-<?php the_ID(); ?>" class="actualite-item">
-                <a href="<?php the_permalink(); ?>" class="actualite-link">
-
-                    <!-- Afficher la Thumbnail -->
-                    <?php if (has_post_thumbnail()) : ?>
-                        <div class="actualite-photo">
-                            <?php the_post_thumbnail('large'); ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="actualite-info">
-                        <!-- Afficher le titre -->
-                        <h2 class="actualite-title"><?php the_title(); ?></h2>
-
-                        <!-- Afficher l'introduction avec une limite de 100 caractères -->
-                        <?php $paragraphe_intro = get_field('paragraphe_introduction'); ?>
-                        <?php if ($paragraphe_intro) : ?>
-                            <p class="actualite-intro"><?php echo wp_trim_words($paragraphe_intro, 28, ' [...]'); ?></p>
-                        <?php endif; ?>
-                    </div>
-
-                    
-                    <div class="actualite-details">
-                     
-                            <?php
-                            // Utiliser get_the_terms pour récupérer les tags
-                            $tags = get_the_terms(get_the_ID(), 'post_tag');
-                            if ($tags && !is_wp_error($tags)) :
-                                echo '<div class="actualite-tags">';
-                                foreach ($tags as $tag) {
-                                    // Utiliser un span au lieu d'un lien
-                                    echo '<span class="tag-button">' . esc_html($tag->name) . '</span> ';
-                                }
-                                echo '</div>';
-                            endif;
-                            ?>
-                        </div>
-                </a>
-            </article>
-        <?php endwhile;
-        wp_reset_postdata();
-    else :
-        echo '<p>Aucune actualité trouvée.</p>';
-    endif;
-    ?>
-</div>
-
-<!-- Bouton Voir plus -->
-<div class="voir-plus-container">
-    <a href="<?php echo get_post_type_archive_link('actualite'); ?>" class="voir-plus-button">Voir plus</a>
-</div>
-
-</div>
 
 <?php
 // Récupérer toutes les publications "portrait" avec des coordonnées
@@ -225,6 +176,7 @@ $photo_profil = wp_get_attachment_url($photo_profil_id); // Convertit en URL si 
                 'lng' => get_post_meta(get_the_ID(), '_longitude', true),
                 'nom_portrait' => get_the_title(),
                 'photo_profil' => $photo_profil,
+                'permalink' => get_permalink(get_the_ID()),
                 'metiers' => $metiers,  // Liste des métiers
                 'promotions' => $promotions, // Liste des promotions
             ];
@@ -234,7 +186,7 @@ $photo_profil = wp_get_attachment_url($photo_profil_id); // Convertit en URL si 
 wp_reset_postdata();
 ?>
 
-<h1 class="page-titleAccueil">Carte des anciens MMI : Où sont-ils maintenant ?</h1>
+<h1 class="page-titleMap">Ils ont quitté le nid MMI, découvrez leur planque !</h1>
 
 
 
@@ -261,21 +213,134 @@ wp_reset_postdata();
 </div>
 
 
-
-
 <div class="containerArticle">
 
-<h1 class="page-titleAccueil">Avis sur la formation</h1>
+<h1 class="page-titleArticle">Breaking News MMI</h1>
+
+<div class="actualite-archive-grid">
+    <?php
+    // Requête pour récupérer 3 articles récents (ou aléatoires, selon vos besoins)
+    $args = array(
+        'post_type' => 'actualite', // Type de contenu : article
+        'posts_per_page' => 3, // Nombre d'articles à afficher
+        'orderby' => 'date', // Trier par date (ou 'rand' pour aléatoire)
+        'order' => 'DESC', // Du plus récent au plus ancien
+    );
+
+    $actualite_query = new WP_Query($args);
+
+    if ($actualite_query->have_posts()) :
+        while ($actualite_query->have_posts()) : $actualite_query->the_post(); ?>
+            <article id="post-<?php the_ID(); ?>" class="actualite-item">
+                <a href="<?php the_permalink(); ?>" class="actualite-link">
+
+                    <!-- Afficher la Thumbnail -->
+                    <?php if (has_post_thumbnail()) : ?>
+                        <div class="actualite-photo">
+                            <?php the_post_thumbnail('large'); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="actualite-info">
+                        <!-- Afficher le titre -->
+                        <h2 class="actualite-title"><?php the_title(); ?></h2>
+
+                        <!-- Afficher l'introduction avec une limite de 100 caractères -->
+                        <?php $paragraphe_intro = get_field('paragraphe_introduction'); ?>
+                        <?php if ($paragraphe_intro) : ?>
+                            <p class="actualite-intro"><?php echo wp_trim_words($paragraphe_intro, 28, ' [...]'); ?></p>
+                        <?php endif; ?>
+
+
+                        <p class="actualite-meta" style="padding-top: 10px;">
+                            Publié par <?php echo esc_html(get_the_author()); ?> le <?php echo esc_html(get_the_date()); ?>
+                        </p>
+
+                    </div>
+
+                    
+                    <div class="actualite-details">
+                     
+                            <?php
+                            // Utiliser get_the_terms pour récupérer les tags
+                            $tags = get_the_terms(get_the_ID(), 'post_tag');
+                            if ($tags && !is_wp_error($tags)) :
+                                echo '<div class="actualite-tags">';
+                                foreach ($tags as $tag) {
+                                    // Utiliser un span au lieu d'un lien
+                                    echo '<span class="tag-button">' . esc_html($tag->name) . '</span> ';
+                                }
+                                echo '</div>';
+                            endif;
+                            ?>
+                        </div>
+                </a>
+            </article>
+        <?php endwhile;
+        wp_reset_postdata();
+    else :
+        echo '<p>Aucune actualité trouvée.</p>';
+    endif;
+    ?>
+</div>
+
+<!-- Bouton Voir plus -->
+<div class="voir-plus-container">
+    <a href="<?php echo get_post_type_archive_link('actualite'); ?>" class="voir-plus-button">Voir plus</a>
+</div>
 
 </div>
 
 
+
+<script src="https://www.goat1000.com/tagcanvas.min.js"></script>
+<script src="https://www.goat1000.com/tagcanvas.js"></script>
+
+<h1 class="page-titleCloud">Ce qu’ils retiennent et ce qu’ils veulent oublier en un mot !</h1>
+
+<canvas id="tag-canvas" width="500" height="500"></canvas>
+<ul id="tags" style="display: none;">
+    <li><a href="#">Diversité</a></li>
+    <li><a href="#">pluridisciplinaire</a></li>
+    <li><a href="#">Famille</a></li>
+    <li><a href="#">Excellence</a></li>
+    <li><a href="#">Rigueur</a></li>
+    <li><a href="#">Intense</a></li>
+    <li><a href="#">Ambiance</a></li>
+    <li><a href="#">Inoubliable</a></li>
+    <li><a href="#">Qualité</a></li>
+    <li><a href="#">Profs</a></li>
+    <li><a href="#">Opportunité</a></li>
+    <li><a href="#">Échnage</a></li>
+    <li><a href="#">Changement</a></li>
+    <li><a href="#">Fierté</a></li>
+    <li><a href="#">Euh...</a></li>
+    <li><a href="#">Perte de cheveux</a></li>
+    <li><a href="#">Amitité</a></li>
+    <li><a href="#">Souvenirs</a></li>
+    
+</ul>
+
+<p style="text-align: center;">Si vous avez des questions n’hesitez pas a regarder notre FAQ !</p>
+
+<div class="voir-faq-container">
+    <a href="<?php echo get_permalink(get_page_by_title('FAQ')); ?>" class="voir-faq">FAQ</a>
+</div>
+
 <?php get_footer(); ?>
 
-
-
-
 <script>
+
+window.onload = function () {
+        TagCanvas.Start('tag-canvas', 'tags', {
+            outlineColour: 'transparent',
+            textColour: ['#002C40', '#D90B3D', '#1673BA', '#8a2be2'],
+            reverse: true,
+            depth: 0.8,
+            maxSpeed: 0.05,
+        });
+    };
+
 document.addEventListener('DOMContentLoaded', function () {
     const map = L.map('map').setView([48.8566, 2.3522], 5); // Centré sur la France
 
@@ -378,7 +443,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 filteredCityLocations.forEach(loc => {
                     const imgTag = loc.photo_profil
                         ? `<img src="${loc.photo_profil}" alt="Photo de ${loc.nom_portrait}" class="profile-photo">`
-                        : '';
+                        : `<img src="<?php echo get_template_directory_uri() . '/images/DefaultProfil.png'; ?>" alt="Default Profile Picture" class="profile-photo">`;
                     const metiers = loc.metiers.length
                         ? `<p class="card-metier">${loc.metiers.join(', ')}</p>`
                         : '';
@@ -394,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                         <div class="card-right">
                             <div class="card-header">
-                                <h4 class="card-name">${loc.nom_portrait}</h4>
+                                <a href="${loc.permalink}" class="card-name">${loc.nom_portrait}</a>
                                 <p class="card-company">${loc.nom_entreprise}</p>
                             </div>
                             ${metiers}
@@ -405,7 +470,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 document.getElementById('overlay').style.display = 'block';
-                document.getElementById('map').style.width = '75%';
             });
         });
 
@@ -428,6 +492,160 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <style>
 
+.first-section {
+    padding: 40px 0px;
+    text-align: center;
+}
+
+.first-section-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.first-section-text {
+    flex: 1;
+    padding-right: 40px;
+    padding-left:40px;
+}
+
+.first-section-title {
+    font-size: 45px;
+    font-family: 'Aristotelica Display Trial', sans-serif;
+    font-weight: bold;
+    text-align: start;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.first-section-paragraph {
+    font-size: 20px;
+    color: black;
+    text-align: start;
+    line-height: 1.6;
+}
+
+.first-section-images {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+}
+
+.first-section-left-image,
+.first-section-right-image {
+    max-width: 100%;
+    height: auto;
+    border-top-left-radius: 65px;
+}
+
+@media (max-width: 768px) {
+    .first-section-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .first-section-text {
+        padding-right: 40px;
+        margin-bottom: 20px;
+    }
+
+    .first-section-images {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .first-section-left-image,
+    .first-section-right-image {
+        max-width: 90%;
+        margin-bottom: 20px;
+        border-top-left-radius:0;
+    }
+}
+
+@media screen and (max-width: 1150px) {
+
+    .first-section-title {
+        font-size: 30px;
+    }
+
+    .first-section-paragraph {
+        font-size: 16px;
+    }
+
+}
+
+
+@media screen and (max-width: 900px) {
+
+    .first-section-title {
+        font-size: 25px;
+    }
+
+.first-section-paragraph {
+    font-size: 15px;
+}
+
+}
+
+#tag-canvas {
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.page-titleCloud {
+    font-size: 2em;
+    text-transform: uppercase;
+    text-align: center;
+    font-family: 'Aristotelica Display Trial', sans-serif;
+}
+
+.word-cloud {
+    width: 80%;
+    height: 80vh;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    overflow: hidden;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.word-cloud .word {
+    position: absolute;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    transition: transform 0.3s, color 0.3s;
+}
+
+.word-cloud .word:hover {
+    transform: scale(1.3);
+    cursor: pointer;
+}
+
+.color-1 {
+    color: #ff4500; /* Orange */
+}
+
+.color-2 {
+    color: #1e90ff; /* Bleu */
+}
+
+.color-3 {
+    color: #32cd32; /* Vert */
+}
+
+.color-4 {
+    color: #8a2be2; /* Violet */
+}
+
 /* Conteneur global pour la carte et l'overlay */
 #map-wrapper {
     display: flex;
@@ -437,6 +655,7 @@ document.addEventListener('DOMContentLoaded', function () {
     margin: auto;
     width: 90%;
     height: 500px;
+    margin-bottom: 85px;
 }
 
 /* Carte */
@@ -449,7 +668,7 @@ document.addEventListener('DOMContentLoaded', function () {
 /* Overlay */
 #overlay {
     height: 100%;
-    width: 30%;
+    width: 40%;
     background-color: #f9f9f9;
     padding: 20px;
     box-sizing: border-box;
@@ -483,6 +702,31 @@ document.addEventListener('DOMContentLoaded', function () {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.voir-faq-container {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 60px;
+}
+
+.voir-faq {
+    background-color: #F4BB46;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.page-titleMap{
+    font-size: 2em;
+    text-transform: uppercase;
+    margin-bottom: 85px;
+    text-align: center;
+    margin-top: 85px;
+    font-family: 'Aristotelica Display Trial', sans-serif;
 }
 
 .card-right {
@@ -583,6 +827,238 @@ document.addEventListener('DOMContentLoaded', function () {
 .tag-button:hover {
     background-color: #002C40;
     color: #fff;
+}
+
+
+/* Styles du carousel */
+.avis-carousel {
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Styles pour chaque card */
+.avis-card {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.card-content-avis {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-left-avis {
+    flex-shrink: 0;
+    margin-right: 10px;
+}
+
+.card-left-avis img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.card-right-avis {
+    flex-grow: 1;
+}
+
+.card-name-avis {
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.card-paragraph-avis {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+    text-align: start;
+}
+
+/* Styles des flèches et des points de navigation */
+.slick-prev, .slick-next {
+    font-size: 24px;
+    color: #333;
+}
+
+.slick-dots {
+    position: unset;
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin: auto;
+    list-style: none;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.slick-dots li button:before {
+    font-size: 10px;
+    color: #333;
+}
+
+.slick-slide {
+    display: none;
+    float: left;
+    height: unset;
+    min-height: 1px;
+}
+
+.slick-track {
+    
+    opacity: 1;
+    width: 981px;
+    transform: translate3d(0px, 0px, 0px);
+    display: flex;
+    gap: 2rem;
+}
+
+.image-container {
+    position: relative;
+}
+
+.image-section {
+    width: 100%;
+}
+
+.text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 120px;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 26px;
+    font-weight: bold;
+    font-family: 'Aristotelica Display Trial', sans-serif;
+}
+
+.logo-overlay {
+    position: absolute;
+    top: 50%;
+    right: 170px;
+    transform: translateY(-50%);
+}
+
+.logo-section {
+    max-width: 400px;
+}
+
+@media screen and (max-width: 1000px) {
+    .filter-container {
+            top: 380px;
+            left: 10px;
+            max-width: 200px;
+    }
+
+    .filter-container select, input {
+        padding: 5px;
+        font-size: 11px;
+    }
+}
+
+@media screen and (max-width: 880px) {
+
+#map-wrapper {
+    display: block;
+}
+
+    #map {
+        position: relative;
+    width: 90%;
+    margin: auto;
+    }
+
+    #overlay {
+    height: 100%;
+    width: 90%;
+    margin: auto;
+    height: fit-content;
+    margin-top:10px;
+}
+
+}
+
+@media screen and (max-width: 1200px) {
+
+    .logo-overlay {
+
+        top: 50%;
+        right: 100px;
+ 
+    }
+
+    .text-overlay {
+        left:90px
+    }
+}
+
+@media screen and (max-width: 1050px) {
+
+    .logo-section{
+        max-width: 300px;
+    }
+
+    .text-overlay {
+        left:70px;
+        font-size: 20px;
+    }
+}
+
+@media screen and (max-width: 830px) {
+    .logo-overlay {
+        left: 50%;
+        top: 20%;
+        transform: translate(-50%, 50%);
+        margin-right:0px;
+        right: auto;
+    }
+
+    .image-section {
+        height: 400px;
+        object-fit: cover;
+    }
+
+    .text-overlay {
+        left: 50%;
+        font-size: 20px;
+        transform: translate(-50%, 50%);
+        top: 30%;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .text-overlay {
+        width: 300px;
+        font-size:18px;
+    }
+
+    .alumni-text {
+        font-size: 14px;
+    }
+
+    .espace-membre {
+        font-size: 12px;
+    }
+
+    .yellow-band {
+        gap:10px;
+    }
+
+    .page-titleCloud {
+            font-size: 1.5em;
+        }
+
+        #tag-canvas {
+            width: 80%;
+        }
+
+  
 }
 
 </style>
